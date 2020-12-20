@@ -1,0 +1,44 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const GameElement_1 = require("../GameElement/GameElement");
+class InitState {
+    constructor(fsm, game) {
+        this.name = "InitState";
+        this._fsm = null;
+        this._game = null;
+        this._fsm = fsm;
+        this._game = game;
+    }
+    Enter() {
+        //初始化网格，甜品实例
+        let cols = this._game.elementCols;
+        let rows = this._game.elementRows;
+        let elements = new Array();
+        let grids = new Array();
+        for (let i = 0; i < cols; i++) {
+            elements[i] = Array();
+            grids[i] = Array();
+            for (let j = 0; j < rows; j++) {
+                var element = new GameElement_1.GameElement();
+                var view = this._game.gameController.CreateGameElementView(i, j, GameElement_1.GameElementType.Empty);
+                element.Init(i, j, GameElement_1.GameElementType.Empty);
+                element.elementView = view;
+                elements[i][j] = element;
+                var grid = new GameElement_1.GameElement();
+                grid.Init(i, j, GameElement_1.GameElementType.Grid);
+                var gridView = this._game.gameController.CreateGameElementView(i, j, GameElement_1.GameElementType.Grid);
+                grid.elementView = gridView;
+                elements[i][j] = grid;
+            }
+        }
+        this._game.SetGameElements(elements);
+        this._game.SetGrids(grids);
+        this._fsm.NextState();
+    }
+    Update(deltaTime) {
+    }
+    Exit() {
+    }
+}
+exports.InitState = InitState;
+//# sourceMappingURL=InitState.js.map

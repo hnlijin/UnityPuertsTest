@@ -1,0 +1,48 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const FSM_1 = require("./Common/FSM");
+const FillBarrierState_1 = require("./GameState/FillBarrierState");
+const FillElementState_1 = require("./GameState/FillElementState");
+const InitState_1 = require("./GameState/InitState");
+class EliminateGame {
+    constructor() {
+        this.fillTime = 0.1;
+        this._elementRows = 8;
+        this._elementCols = 8;
+        this._fsm = null;
+        this._grids = null;
+        this._elements = null;
+        this._gameController = null;
+        this._fsm = new FSM_1.FSM();
+    }
+    get gameElements() { return this._elements; }
+    get elementCols() { return this._elementCols; }
+    get elementRows() { return this._elementRows; }
+    get gameController() { return this._gameController; }
+    SetGameElements(elements) {
+        this._elements = elements;
+    }
+    SetGrids(grids) {
+        this._grids = grids;
+    }
+    OnCreateBarrierComplete() {
+        this._fsm.ChangeState(new FillElementState_1.FillElementState(this._fsm, this));
+    }
+    Init(elementRows, elementCols, gameController) {
+        this._elementRows = elementRows;
+        this._elementCols = elementCols;
+        this._gameController = gameController;
+        this._fsm.SetNextState(new FillBarrierState_1.FillBarrierState(this._fsm, this));
+        this._fsm.ChangeState(new InitState_1.InitState(this._fsm, this));
+    }
+    Start() {
+    }
+    Update(deltaTime) {
+        this._fsm.Update(deltaTime);
+    }
+    Destory() {
+        this._fsm.Destory();
+    }
+}
+exports.EliminateGame = EliminateGame;
+//# sourceMappingURL=EliminateGame.js.map

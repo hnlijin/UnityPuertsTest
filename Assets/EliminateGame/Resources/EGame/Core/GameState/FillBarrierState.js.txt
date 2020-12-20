@@ -1,0 +1,33 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const GameElement_1 = require("../GameElement/GameElement");
+class FillBarrierState {
+    constructor(fsm, game) {
+        this.name = "FillBarrierState";
+        this._fsm = null;
+        this._game = null;
+        this._fsm = fsm;
+        this._game = game;
+    }
+    Enter() {
+        let barrierCount = 10;
+        let cols = this._game.elementCols;
+        let rows = this._game.elementRows;
+        let elements = this._game.gameElements;
+        for (let i = 0; i < barrierCount; i++) {
+            let x = Math.floor(Math.random() * cols);
+            let y = Math.floor(Math.random() * rows);
+            let element = elements[x][y];
+            let view = this._game.gameController.CreateGameElementView(x, y, GameElement_1.GameElementType.Barrier);
+            element.Init(x, y, GameElement_1.GameElementType.Barrier);
+            element.elementView = view;
+        }
+        this._game.OnCreateBarrierComplete();
+    }
+    Update(deltaTime) {
+    }
+    Exit() {
+    }
+}
+exports.FillBarrierState = FillBarrierState;
+//# sourceMappingURL=FillBarrierState.js.map

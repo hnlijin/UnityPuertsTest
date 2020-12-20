@@ -1,0 +1,45 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var GameElementType;
+(function (GameElementType) {
+    GameElementType[GameElementType["Grid"] = -1] = "Grid";
+    GameElementType[GameElementType["Empty"] = 0] = "Empty";
+    GameElementType[GameElementType["Normal"] = 1] = "Normal";
+    GameElementType[GameElementType["Barrier"] = 2] = "Barrier";
+    GameElementType[GameElementType["Any"] = 3] = "Any";
+    GameElementType[GameElementType["Same"] = 4] = "Same";
+})(GameElementType = exports.GameElementType || (exports.GameElementType = {}));
+class GameElement {
+    get x() { return this._x; }
+    get y() { return this._y; }
+    get elementType() { return this._elementType; }
+    get elementView() { return this._elementView; }
+    Init(x, y, elementType) {
+        this._x = x;
+        this._y = y;
+        this._elementType = elementType;
+    }
+    set elementView(value) {
+        if (this._elementView != null && this._elementView != value) {
+            this._elementView.DestroyView();
+        }
+        this._elementView = value;
+    }
+    CanMove() {
+        if (this._elementType == GameElementType.Barrier ||
+            this._elementType == GameElementType.Empty ||
+            this._elementType == GameElementType.Grid) {
+            return false;
+        }
+        return true;
+    }
+    MoveElement(targetX, targetY, time) {
+        this._x = targetX;
+        this._y = targetY;
+        if (this.CanMove()) {
+            this._elementView.MoveElement(targetX, targetY, time);
+        }
+    }
+}
+exports.GameElement = GameElement;
+//# sourceMappingURL=GameElement.js.map

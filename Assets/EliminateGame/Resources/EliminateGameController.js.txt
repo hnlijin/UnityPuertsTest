@@ -1,0 +1,47 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const EliminateGame_1 = require("./EGame/Core/EliminateGame");
+const csharp_1 = require("csharp");
+class GameElementView {
+    constructor(x, y, elementType) {
+        this._x = x;
+        this._y = y;
+        this._elementType = elementType;
+    }
+    MoveElement(targetX, targetY, time) {
+    }
+    SetImageView(x, y) {
+    }
+    DestroyView() {
+    }
+}
+class EliminateGameController extends csharp_1.UnityEngine.MonoBehaviour {
+    constructor() {
+        super(...arguments);
+        this.game = new EliminateGame_1.EliminateGame();
+        this._gameController = null;
+        this._elementContainer = null;
+        this._elementViews = {};
+    }
+    CreateGameElementView(x, y, elementType) {
+        // this._gameController.SendMessage("CreateGameElementView", x + "," + y + "," + elementType);
+        // if (elementType == GameElementType.Grid) {
+        return null;
+        // }
+        // var view = new GameElementView(x, y, elementType);
+        // this._elementViews[x + "_" + y] = view;
+        // return view;
+    }
+    ReplaceGameElementView(oldX, oldY, targetX, targetY, onlyUpdateName = false) {
+    }
+    Awake() {
+        this.game.Init(5, 7, this);
+        this._elementContainer = csharp_1.UnityEngine.GameObject.Find("ElementContainer");
+        this._gameController = this._elementContainer.GetComponent("EliminateGameController");
+    }
+    Start() {
+        this.game.Start();
+    }
+}
+exports.EliminateGameController = EliminateGameController;
+//# sourceMappingURL=EliminateGameController.js.map

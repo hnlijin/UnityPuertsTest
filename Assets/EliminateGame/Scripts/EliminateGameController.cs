@@ -4,7 +4,7 @@ using UnityEngine;
 using Puerts;
 using EGame.Core;
 
-public class EliminateGameController : MonoBehaviour, IEliminateGameController
+public class EliminateGameController : MonoBehaviour //, IEliminateGameController
 {
     [System.Serializable]
     public struct ElementImageView
@@ -22,7 +22,8 @@ public class EliminateGameController : MonoBehaviour, IEliminateGameController
 
     JsEnv jsEnv = null;
 
-    public IGameElementView CreateGameElementView(int x, int y, GameElementType elementType)
+    // public IGameElementView CreateGameElementView(int x, int y, GameElementType elementType)
+    public GameElementView CreateGameElementView(int x, int y, GameElementType elementType)
     {
         var elementPrefab = this._dictElementPrefabs[elementType];
         if (elementPrefab != null) {

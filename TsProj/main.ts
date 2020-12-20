@@ -1,6 +1,6 @@
-import { EliminateGameController } from "./EliminateGameController";
+import { Game } from "./Game";
 
-var game = new EliminateGameController();
+var game = new Game();
 game.Awake();
 game.Start();
 

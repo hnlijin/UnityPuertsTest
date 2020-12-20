@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Puerts;
 using System;
 using UnityEngine;
+using System.Reflection;
 
 //1、配置类必须打[Configure]标签
 //2、必须放Editor目录
@@ -22,38 +23,27 @@ public class ExamplesCfg
         {
             return new List<Type>()
             {
-                typeof(Debug),
-                typeof(PuertsTest.TestClass),
-                typeof(Vector3),
-                typeof(List<int>),
-                typeof(Dictionary<string, List<int>>),
-                typeof(PuertsTest.BaseClass),
-                typeof(PuertsTest.DerivedClass),
-                typeof(PuertsTest.BaseClassExtension),
-                typeof(PuertsTest.MyEnum),
-                typeof(Time),
-                typeof(Transform),
-                typeof(Component),
+                // typeof(Debug),
+                // typeof(Vector3),
+                // typeof(List<int>),
+                // typeof(Dictionary<string, List<int>>),
+                // typeof(Time),
+                // typeof(Transform),
+                // typeof(Component),
                 typeof(GameObject),
-                typeof(UnityEngine.Object),
-                typeof(Delegate),
-                typeof(System.Object),
-                typeof(Type),
-                typeof(ParticleSystem),
-                typeof(Canvas),
-                typeof(RenderMode),
-                typeof(Behaviour),
-                typeof(MonoBehaviour),
+                // typeof(UnityEngine.Object),
+                // typeof(Delegate),
+                // typeof(System.Object),
+                // typeof(Type),
+                // typeof(ParticleSystem),
+                // typeof(Canvas),
+                // typeof(RenderMode),
+                // typeof(Behaviour),
+                // typeof(MonoBehaviour),
 
-                typeof(UnityEngine.EventSystems.UIBehaviour),
-                typeof(UnityEngine.UI.Selectable),
-                typeof(UnityEngine.UI.Button),
-                typeof(UnityEngine.UI.Button.ButtonClickedEvent),
-                typeof(UnityEngine.Events.UnityEvent),
-                typeof(UnityEngine.UI.InputField),
-                typeof(UnityEngine.UI.Toggle),
-                typeof(UnityEngine.UI.Toggle.ToggleEvent),
-                typeof(UnityEngine.Events.UnityEvent<bool>),
+                typeof(GameElementImageView),
+                typeof(GameElementView),
+                typeof(EliminateGameController),
 
             };
         }

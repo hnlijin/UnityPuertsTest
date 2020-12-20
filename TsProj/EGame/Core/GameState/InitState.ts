@@ -34,7 +34,7 @@ export class InitState implements IState
                 grid.Init(i, j, GameElementType.Grid);
                 var gridView = this._game.gameController.CreateGameElementView(i, j, GameElementType.Grid);
                 grid.elementView = gridView;
-                elements[i][j] = grid;
+                grids[i][j] = grid;
             }
         }
         this._game.SetGameElements(elements);

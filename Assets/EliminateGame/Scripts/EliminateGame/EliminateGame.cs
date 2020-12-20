@@ -45,14 +45,14 @@ namespace EGame.Core
         }
 
         public void OnCreateBarrierComplete() {
-            this._fsm.ChangeState(new CreateElementState(this._fsm, this));
+            this._fsm.ChangeState(new FillElementState(this._fsm, this));
         }
 
         public void Init(int elementRows, int elementCols, IEliminateGameController gameController) {
             this._elementRows = elementRows;
             this._elementCols = elementCols;
             this._gameController = gameController;
-            this._fsm.SetNextState(new CreateBarrierState(this._fsm, this));
+            this._fsm.SetNextState(new FillBarrierState(this._fsm, this));
             this._fsm.ChangeState(new InitState(this._fsm, this));
         }
 

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GameElement = exports.GameElementType = void 0;
 var GameElementType;
 (function (GameElementType) {
     GameElementType[GameElementType["Grid"] = -1] = "Grid";

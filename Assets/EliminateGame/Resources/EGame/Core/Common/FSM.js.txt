@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FSM = void 0;
 class FSM {
     constructor() {
         this._preState = null;

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.InitState = void 0;
 const GameElement_1 = require("../GameElement/GameElement");
 class InitState {
     constructor(fsm, game) {
@@ -28,7 +29,7 @@ class InitState {
                 grid.Init(i, j, GameElement_1.GameElementType.Grid);
                 var gridView = this._game.gameController.CreateGameElementView(i, j, GameElement_1.GameElementType.Grid);
                 grid.elementView = gridView;
-                elements[i][j] = grid;
+                grids[i][j] = grid;
             }
         }
         this._game.SetGameElements(elements);

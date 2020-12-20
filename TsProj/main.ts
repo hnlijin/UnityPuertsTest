@@ -1,7 +1,7 @@
 import { Game } from "./Game";
+import { UnityEngine } from "csharp";
 
 var game = new Game();
-game.Awake();
-game.Start();
+game.Start()
 
 console.log("ts hello world!");

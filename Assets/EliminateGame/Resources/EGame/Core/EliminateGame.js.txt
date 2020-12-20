@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.EliminateGame = void 0;
 const FSM_1 = require("./Common/FSM");
 const FillBarrierState_1 = require("./GameState/FillBarrierState");
 const FillElementState_1 = require("./GameState/FillElementState");

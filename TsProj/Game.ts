@@ -14,6 +14,8 @@ class ElementView implements IGameElementView {
         this._view = view;
     }
     public MoveElement(targetX: number, targetY: number, time: number): void {
+        this._x = targetX;
+        this._y = targetY;
         this._view.MoveElement(targetX, targetY, time);
     }
     public imageView: IGameElementImageView;
@@ -47,14 +49,16 @@ export class Game implements IEliminateGameController
         this._gameController.ReplaceGameElementView(oldX, oldY, targetX, targetY, onlyUpdateName);
     }
     
-    public Awake() {
+    public Start() {
         this._elementContainer = UnityEngine.GameObject.Find("ElementContainer");
         this._gameController = this._elementContainer.GetComponent("EliminateGameController") as EliminateGameController;
         this.game.Init(5, 7, this);
-    }
-
-    public Start() {
         this.game.Start();
+        let self = this;
+        let deltaTime = 1 / 60;
+        setInterval(() => {
+            self.Update(deltaTime);
+        }, deltaTime);
     }
 
     public Update(deltaTime: number) {

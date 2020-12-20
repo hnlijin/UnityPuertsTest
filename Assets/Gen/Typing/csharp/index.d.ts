@@ -1,4 +1,4 @@
-﻿// @ts-nocheck
+﻿
 declare module 'csharp' {
     interface $Ref<T> {
         value: T
@@ -34,6 +34,8 @@ declare module 'csharp' {
             public set tag(value: string);
             /** Scene that the GameObject is part of. */
             public get scene(): UnityEngine.SceneManagement.Scene;
+            /** Scene culling mask Unity uses to determine which scene to render the GameObject in. */
+            public get sceneCullingMask(): bigint;
             
             public get gameObject(): UnityEngine.GameObject;
             
@@ -279,7 +281,6 @@ declare module 'csharp' {
             
         }
         
-        // @ts-nocheck
         class GameElementView extends UnityEngine.MonoBehaviour {
             
             public elementType: EGame.Core.GameElementType;
@@ -302,6 +303,14 @@ declare module 'csharp' {
         
         class EliminateGameController extends UnityEngine.MonoBehaviour {
             
+            public elementContainer: UnityEngine.GameObject;
+            
+            public gridContainer: UnityEngine.GameObject;
+            
+            public elementPrefabs: System.Array$1<GameElementView>;
+            
+            public elementImageViews: System.Array$1<ElementImageView>;
+            
             public constructor();
             
             public CreateGameElementView($x: number, $y: number, $elementType: EGame.Core.GameElementType):GameElementView;
@@ -314,23 +323,16 @@ declare module 'csharp' {
             
         }
         
+        class ElementImageView extends System.ValueType {
+            
+        }
+        
     
     namespace EGame.Core {
         
         enum GameElementType { Grid = -1, Empty = 0, Normal = 1, Barrier = 2, Any = 3, Same = 4 }
         
         interface IGameElementImageView {
-            
-        }
-        
-        class EliminateGame extends System.Object {
-            
-        }
-        
-    }
-    namespace EliminateGameController {
-        
-        class ElementImageView extends System.ValueType {
             
         }
         

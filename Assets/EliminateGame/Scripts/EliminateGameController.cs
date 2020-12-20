@@ -4,19 +4,20 @@ using UnityEngine;
 using Puerts;
 using EGame.Core;
 
+[System.Serializable]
+public struct ElementImageView
+{
+    public int imageId;
+    public Sprite sprite;
+}
+
 public class EliminateGameController : MonoBehaviour //, IEliminateGameController
 {
-    [System.Serializable]
-    public struct ElementImageView
-    {
-        public int imageId;
-        public Sprite sprite;
-    }
     public GameObject elementContainer;
     public GameObject gridContainer;
     public GameElementView[] elementPrefabs;
     public ElementImageView[] elementImageViews;
-    public EliminateGame game = new EliminateGame();
+    private EliminateGame game = new EliminateGame();
     private Dictionary<GameElementType, GameElementView> _dictElementPrefabs = null;
     private System.Random _random = new System.Random();
 
@@ -27,12 +28,14 @@ public class EliminateGameController : MonoBehaviour //, IEliminateGameControlle
     {
         var elementPrefab = this._dictElementPrefabs[elementType];
         if (elementPrefab != null) {
+            var elementName = "element:" + x + "," + y;
             var parent = this.elementContainer.transform;
             if (elementType == GameElementType.Grid) {
                 parent = this.gridContainer.transform;
+                elementName = "grid:" + x + "," + y;
             }
             var view = Instantiate(elementPrefab, ConvertElementToUnityPos(x, y), Quaternion.identity, parent);
-            view.gameObject.name = "element:" + x + "," + y;
+            view.gameObject.name = elementName;
             view.gameController = this;
             return view;
         }
@@ -48,8 +51,7 @@ public class EliminateGameController : MonoBehaviour //, IEliminateGameControlle
         }
     }
 
-    public void SetGameElementImageView(int x, int y, GameElementImageView imageView) {
-        var index = this._random.Next(0, this.elementImageViews.Length);
+    public void SetGameElementImageView(int x, int y, GameElementImageView imageView) {        var index = this._random.Next(0, this.elementImageViews.Length);
         imageView.imageId = elementImageViews[index].imageId;
         imageView.spriteRenderer.sprite = elementImageViews[index].sprite;
     }

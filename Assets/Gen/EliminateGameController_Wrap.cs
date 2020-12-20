@@ -328,38 +328,7 @@ namespace PuertsStaticWrap
             {
                 var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
                 var argHelper = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
-                obj.elementImageViews = argHelper.Get<EliminateGameController.ElementImageView[]>(false);
-            }
-            catch (Exception e)
-            {
-                Puerts.PuertsDLL.ThrowException(isolate, "c# exception:" + e.Message + ",stack:" + e.StackTrace);
-            }
-        }
-        
-        
-        [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
-        private static void G_game(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
-        {
-            try
-            {
-                var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
-                var result = obj.game;
-                Puerts.ResultHelper.Set((int)data, isolate, info, result);
-            }
-            catch (Exception e)
-            {
-                Puerts.PuertsDLL.ThrowException(isolate, "c# exception:" + e.Message + ",stack:" + e.StackTrace);
-            }
-        }
-        
-        [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
-        private static void S_game(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
-        {
-            try
-            {
-                var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
-                var argHelper = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
-                obj.game = argHelper.Get<EGame.Core.EliminateGame>(false);
+                obj.elementImageViews = argHelper.Get<ElementImageView[]>(false);
             }
             catch (Exception e)
             {
@@ -390,7 +359,6 @@ namespace PuertsStaticWrap
                     {"gridContainer", new Puerts.PropertyRegisterInfo(){ IsStatic = false, Getter = G_gridContainer, Setter = S_gridContainer} },
                     {"elementPrefabs", new Puerts.PropertyRegisterInfo(){ IsStatic = false, Getter = G_elementPrefabs, Setter = S_elementPrefabs} },
                     {"elementImageViews", new Puerts.PropertyRegisterInfo(){ IsStatic = false, Getter = G_elementImageViews, Setter = S_elementImageViews} },
-                    {"game", new Puerts.PropertyRegisterInfo(){ IsStatic = false, Getter = G_game, Setter = S_game} },
                     
                 }
             };

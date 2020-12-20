@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const EliminateGameController_1 = require("./EliminateGameController");
-var game = new EliminateGameController_1.EliminateGameController();
-game.Awake();
+const Game_1 = require("./Game");
+var game = new Game_1.Game();
 game.Start();
 console.log("ts hello world!");
 //# sourceMappingURL=main.js.map

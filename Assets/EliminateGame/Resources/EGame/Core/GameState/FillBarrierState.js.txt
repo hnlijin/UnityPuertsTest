@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FillBarrierState = void 0;
 const GameElement_1 = require("../GameElement/GameElement");
 class FillBarrierState {
     constructor(fsm, game) {

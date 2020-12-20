@@ -1,0 +1,61 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Game = void 0;
+const EliminateGame_1 = require("./EGame/Core/EliminateGame");
+const GameElement_1 = require("./EGame/Core/GameElement/GameElement");
+const csharp_1 = require("csharp");
+class ElementView {
+    constructor(x, y, elementType, view) {
+        this._x = x;
+        this._y = y;
+        this._elementType = elementType;
+        this._view = view;
+    }
+    MoveElement(targetX, targetY, time) {
+        this._x = targetX;
+        this._y = targetY;
+        this._view.MoveElement(targetX, targetY, time);
+    }
+    SetImageView(x, y) {
+        this._view.SetImageView(x, y);
+    }
+    DestroyView() {
+        this._view.DestroyView();
+    }
+}
+class Game {
+    constructor() {
+        this.game = new EliminateGame_1.EliminateGame();
+        this._gameController = null;
+        this._elementContainer = null;
+        this._elementViews = {};
+    }
+    CreateGameElementView(x, y, elementType) {
+        let gameView = this._gameController.CreateGameElementView(x, y, elementType);
+        if (elementType == GameElement_1.GameElementType.Grid) {
+            return null;
+        }
+        var view = new ElementView(x, y, elementType, gameView);
+        this._elementViews[x + "_" + y] = view;
+        return view;
+    }
+    ReplaceGameElementView(oldX, oldY, targetX, targetY, onlyUpdateName) {
+        this._gameController.ReplaceGameElementView(oldX, oldY, targetX, targetY, onlyUpdateName);
+    }
+    Start() {
+        this._elementContainer = csharp_1.UnityEngine.GameObject.Find("ElementContainer");
+        this._gameController = this._elementContainer.GetComponent("EliminateGameController");
+        this.game.Init(5, 7, this);
+        this.game.Start();
+        let self = this;
+        let deltaTime = 1 / 60;
+        setInterval(() => {
+            self.Update(deltaTime);
+        }, deltaTime);
+    }
+    Update(deltaTime) {
+        this.game.Update(deltaTime);
+    }
+}
+exports.Game = Game;
+//# sourceMappingURL=Game.js.map

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FillElementState = void 0;
 const GameElement_1 = require("../GameElement/GameElement");
 class FillElementState {
     constructor(fsm, game) {
@@ -22,7 +23,8 @@ class FillElementState {
         for (let y = 1; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
                 let element = elements[x][y]; // 得到甜品的虚拟坐标 
-                if (element.CanMove()) {
+                if (element.CanMove()) // 可以移动(即当前是普通甜品)，则往下填充
+                 {
                     // 当前元素的下一行同列元素
                     let nextRowElement = elements[x][y - 1];
                     // 当前元素的下一行左/右列元素, 
@@ -56,6 +58,7 @@ class FillElementState {
                         elements[x][y] = tempElement;
                         filledNotFinished = true;
                     }
+                    // 右斜向填充   存在右下方甜品  且当前甜品右下方甜品类型为空  且当前甜品右侧为障碍
                     else if (nextRowElement_Right != null && nextRowElement_Right.elementType == GameElement_1.GameElementType.Empty
                         && sweetRight.elementType == GameElement_1.GameElementType.Barrier) {
                         // 当前甜品往右下移动
@@ -70,6 +73,7 @@ class FillElementState {
                         elements[x][y] = tempElement;
                         filledNotFinished = true;
                     }
+                    // 左斜向填充  存在左下方甜品  且当前甜品左下方甜品类型为空  且当前甜品左侧为障碍
                     else if (nextRowElement_Left != null && nextRowElement_Left.elementType == GameElement_1.GameElementType.Empty
                         && sweetLeft.elementType == GameElement_1.GameElementType.Barrier) {
                         // 当前甜品往左下移动
@@ -87,7 +91,8 @@ class FillElementState {
                 }
             }
         }
-        for (let i = 0; i < cols; i++) {
+        for (let i = 0; i < cols; i++) // 最上面一行
+         {
             // 游戏场景的第一行
             let x = i, y = rows - 1;
             let element = elements[x][y];
@@ -98,7 +103,7 @@ class FillElementState {
                 // 配置元素属性
                 element.Init(x, y, GameElement_1.GameElementType.Normal);
                 element.MoveElement(x, y, this._game.fillTime);
-                if (element.elementView.imageView != null) {
+                if (element.elementView != null) {
                     element.elementView.SetImageView(x, y);
                 }
                 filledNotFinished = true;

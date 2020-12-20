@@ -115,7 +115,7 @@ export class FillElementState implements IState
                 // 配置元素属性
                 element.Init(x, y, GameElementType.Normal);
                 element.MoveElement(x, y, this._game.fillTime);
-                if (element.elementView.imageView != null) {
+                if (element.elementView != null) {
                     element.elementView.SetImageView(x, y);
                 }
                 filledNotFinished = true;

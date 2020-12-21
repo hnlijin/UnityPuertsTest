@@ -5,6 +5,7 @@ namespace EGame.Core
 {
     public enum GameElementType
     {
+        Null = -2, // 此类型为NULL, 用于消除后没有生成新的元素
         Grid = -1, // 空格子，只用于格子背景
         Empty,
         Normal, // 普通元素: 可以移动
@@ -13,16 +14,17 @@ namespace EGame.Core
         Same, // 同色元素: 可消除同一种颜色所有甜点
     }
 
-    public interface IGameElementImageView {
-        int imageId { set; get; }
-        void RemoveImage();
-    }
+    public delegate void IElementMoveEndCallback(IGameElementView target);
 
     public interface IGameElementView {
-        void MoveElement(int targetX, int targetY, float time);
-        IGameElementImageView imageView { set; get; }
-        void SetImageView(int x, int y);
+        int x { get; }
+        int y { get; }
+        void Init(int x, int y);
+        void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback);
         void DestroyView();
+        int imageId { set; get; }
+        void CreateImageView(int x, int y);
+        void DestroyImageView();
     }
 
     public class GameElement
@@ -69,11 +71,13 @@ namespace EGame.Core
             return true;
         }
 
-        public void MoveElement(int targetX, int targetY, float time) {
+        public void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback) {
             this._x = targetX;
             this._y = targetY;
             if (this.CanMove()) {
-                this._elementView.MoveElement(targetX, targetY, time);
+                this._elementView.MoveElement(targetX, targetY, time, callback);
+            } else if (callback != null) {
+                callback(null);
             }
         }
     }

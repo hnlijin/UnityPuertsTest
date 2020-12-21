@@ -9,6 +9,8 @@ namespace EGame.Core
         private FSM _fsm = null;
         private EliminateGame _game = null;
 
+        public string name { get { return "FillBarrierState"; } }
+
         public FillBarrierState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;
             this._game = game;
@@ -30,7 +32,7 @@ namespace EGame.Core
                 element.Init(x, y, GameElementType.Barrier);
                 element.elementView = view;
             }
-            this._game.OnCreateBarrierComplete();
+            this._game.OnFillBarrierComplete();
         }
 
         public void Update(float deltaTime)

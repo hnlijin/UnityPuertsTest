@@ -5,6 +5,7 @@ namespace EGame.Core
 {
     public interface IState
     {
+        string name { get; }
         void Enter();
         void Update(float deltaTime);
         void Exit();
@@ -20,11 +21,19 @@ namespace EGame.Core
             get { return this._nextState != null; }
         }
 
+        public IState preState {
+            get { return this._currState; }
+        }
+
+        public IState currState {
+            get { return this._currState; }
+        }
+
         public void ChangeState(IState state) {
             if (this._currState != null && this._currState == state) {
                 return;
             }
-            if (this._preState!=null) {
+            if (this._preState != null) {
                 this._preState.Exit();
             }
             this._preState = this._currState;

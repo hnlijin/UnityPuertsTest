@@ -11,6 +11,8 @@ namespace EGame.Core
         private bool _startFill = false;
         private float _frameTime = 0.1f;
 
+        public string name { get { return "FillElementState"; } }
+
         public FillElementState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;
             this._game = game;
@@ -57,14 +59,12 @@ namespace EGame.Core
                         if (nextRowElement.elementType == GameElementType.Empty)
                         {
                             // 当前甜品往下移动
-                            this._game.gameController.ReplaceGameElementView(x, y, x, y - 1, true);
-                            element.MoveElement(x, y - 1, this._game.fillTime);
+                            element.MoveElement(x, y - 1, this._game.fillTime, null);
                             var tempElement = elements[x, y - 1];
-                            this._game.gameController.ReplaceGameElementView(x, y - 1, x, y);
                             // 修改位置信息
                             elements[x, y - 1] = element;
                             // 原来甜品位置 为空
-                            tempElement.Init(x, y, GameElementType.Empty);
+                            tempElement.MoveElement(x, y, 0, null);
                             elements[x, y] = tempElement;
                             filledNotFinished = true;
                         }
@@ -73,14 +73,12 @@ namespace EGame.Core
                         && sweetRight.elementType == GameElementType.Barrier)
                         {
                             // 当前甜品往右下移动
-                            this._game.gameController.ReplaceGameElementView(x, y, x + 1, y - 1, true);
-                            element.MoveElement(x + 1, y - 1, this._game.fillTime);
+                            element.MoveElement(x + 1, y - 1, this._game.fillTime, null);
                             var tempElement = elements[x + 1, y - 1];
-                            this._game.gameController.ReplaceGameElementView(x + 1, y - 1, x, y);
                             // 修改位置信息
                             elements[x + 1, y - 1] = element;
                             // 原来甜品位置 为空
-                            tempElement.Init(x, y, GameElementType.Empty);
+                            tempElement.MoveElement(x, y, 0, null);
                             elements[x, y] = tempElement;
                             filledNotFinished = true;
                         }
@@ -89,14 +87,12 @@ namespace EGame.Core
                         && sweetLeft.elementType == GameElementType.Barrier)
                         {
                             // 当前甜品往左下移动
-                            this._game.gameController.ReplaceGameElementView(x, y, x - 1, y - 1, true);
-                            element.MoveElement(x - 1, y - 1, this._game.fillTime);
+                            element.MoveElement(x - 1, y - 1, this._game.fillTime, null);
                             var tempElement = elements[x - 1, y - 1];
-                            this._game.gameController.ReplaceGameElementView(x - 1, y - 1, x, y);
                             // 修改位置信息
                             elements[x - 1, y - 1] = element;
                             // 原来甜品位置 为空
-                             tempElement.Init(x, y, GameElementType.Empty);
+                            tempElement.MoveElement(x, y, 0, null);
                             elements[x, y] = tempElement;
                             filledNotFinished = true;
                         }
@@ -115,9 +111,9 @@ namespace EGame.Core
                     element.elementView = view;
                     // 配置元素属性
                     element.Init(x, y, GameElementType.Normal);
-                    element.MoveElement(x, y, this._game.fillTime);
+                    element.MoveElement(x, y, this._game.fillTime, null);
                     if (element.elementView != null) {
-                        element.elementView.SetImageView(x, y);
+                        element.elementView.CreateImageView(x, y);
                     }
                     filledNotFinished = true;
                 }
@@ -133,6 +129,7 @@ namespace EGame.Core
                     this._frameTime = 0;
                     if (!this.FillElement()) {
                         this._startFill = false;
+                        this._game.OnFillElementComplete();
                     }
                 }
             }

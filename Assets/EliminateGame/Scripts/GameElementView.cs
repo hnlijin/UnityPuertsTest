@@ -5,15 +5,19 @@ using EGame.Core;
 
 public class GameElementView : MonoBehaviour, IGameElementView
 {
+    public int x { get { return this._x; } }
+    public int y { get { return this._y; } }
     public GameElementType elementType;
-    public IGameElementImageView imageView { set; get; }
     public EliminateGameController gameController { set; get; }
     private GameElementImageView _gameImageView = null;
     private Coroutine _moveCoroutine = null;
+    private IElementMoveEndCallback _moveEndCallback = null;
+    private int _x = 0;
+    private int _y = 0;
+    public int imageId { set; get; }
 
     void Awake() {
         this._gameImageView = GetComponent<GameElementImageView>();
-        this.imageView = _gameImageView;
     }
 
     void Start()
@@ -21,15 +25,53 @@ public class GameElementView : MonoBehaviour, IGameElementView
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
 
-    public void MoveElement(int targetX, int targetY, float time)
+    private void OnMouseDown()
     {
-        if (this._moveCoroutine != null) StopCoroutine(this._moveCoroutine);
+        Debug.Log("OnMouseDown: " + this.gameObject.name + string.Format(", P: {0}/{1}", this.x, this.y));
+        this.gameController.PressedElement(this);
+    }
+
+    private void OnMouseEnter()
+    {
+        Debug.Log("OnMouseEnter: " + this.gameObject.name + string.Format(", P: {0}/{1}", this.x, this.y));
+        this.gameController.EnterElement(this);
+    }    
+
+    private void OnMouseUp()
+    {
+        this.gameController.ReleaseElement(this);
+    }
+
+    public void Init(int x, int y) {
+        this._x = x;
+        this._y = y;
+    }
+
+    public void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback)
+    {
+        this._x = targetX;
+        this._y = targetY;
+        this._moveEndCallback = callback;
+        this.gameObject.name = "element:" + targetX + "_" + targetY;
+        if (this._moveCoroutine != null) {
+            StopCoroutine(this._moveCoroutine);
+            this._moveCoroutine = null;
+        }
+        if (time <= 0) {
+            Vector3 pos = this.gameController.ConvertElementToUnityPos(targetX, targetY);
+            this.transform.position = pos;
+            if (this._moveEndCallback != null) {
+                var callback1 = this._moveEndCallback;
+                this._moveEndCallback = null;
+                callback1(this);
+            }
+            return;
+        }
         this._moveCoroutine = StartCoroutine(MoveCoroutine(targetX, targetY, time));
     }
 
@@ -44,15 +86,31 @@ public class GameElementView : MonoBehaviour, IGameElementView
             yield return 0;
         }
         this.transform.position = endPos;
-        yield return 0;
+        if (this._moveEndCallback != null) {
+            var callback1 = this._moveEndCallback;
+            this._moveEndCallback = null;
+            callback1(this);
+        }
+        yield break;
     }
 
-    public void SetImageView(int x, int y)
+    public void CreateImageView(int x, int y)
     {
-        gameController.SetGameElementImageView(x, y, this._gameImageView);
+        gameController.CreateGameElementImageView(x, y, this);
+    }
+
+    public void UpdateImageView(int imageId, Sprite sprite) {
+        this.imageId = imageId;
+        if (this._gameImageView != null) {
+            this._gameImageView.spriteRenderer.sprite = sprite;
+        }
     }
 
     public void DestroyView() {
         Destroy(this.gameObject);
+    }
+
+    public void DestroyImageView() {
+        Destroy(this._gameImageView.gameObject);
     }
 }

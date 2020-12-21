@@ -37,6 +37,8 @@ namespace EGame.Core
         public EliminateGame() {
             this._fsm = new FSM();
             this._judgeSystem = new JudgeSystem(this);
+
+            this._judgeSystem.RegJudgeRule(new SanlianxiaoJudgeRule(this._judgeSystem));
         }
 
         public GameElement[,] gameElements { get { return this._elements; } }

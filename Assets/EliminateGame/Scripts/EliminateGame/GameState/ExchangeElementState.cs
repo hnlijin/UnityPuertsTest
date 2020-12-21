@@ -70,7 +70,7 @@ namespace EGame.Core
         }
 
         private void PressedElementMoveEnd(IGameElementView view) {
-            IJudgeRule judge = this._game.judgeSystem.StartJudge(this._pressedElement);
+            IJudgeRule judge = this._game.judgeSystem.StartJudge(this._pressedElement, this._enterElement);
             if (judge == null) {
                 this.RevertElement();
             } else {

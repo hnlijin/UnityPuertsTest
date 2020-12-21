@@ -19,8 +19,17 @@ namespace EGame.Core
 
         private EliminateGame _game = null;
         private List<IJudgeRule> _judgeRules = null;
-
         private IGameElementView _pressedElement = null;
+        private IGameElementView _enterElement = null;
+
+        public List<GameElement> leftSameImageList { get { return this._leftSameImageList; } }
+        public List<GameElement> rightSameImageList { get { return this._rightSameImageList; } }
+        public List<GameElement> upSameImageList { get { return this._upSameImageList; } }
+        public List<GameElement> downSameImageList { get { return this._downSameImageList; } }
+        public IGameElementView pressedElement { get { return this._pressedElement; }}
+        public IGameElementView enterElement { get { return this._enterElement; }}
+
+        public EliminateGame game { get { return this._game; } }
 
         public JudgeSystem(EliminateGame game) {
             this._game = game;
@@ -41,8 +50,11 @@ namespace EGame.Core
             }
         }
 
-        public IJudgeRule StartJudge(IGameElementView pressedElement) {
+        public IJudgeRule StartJudge(IGameElementView pressedElement, IGameElementView enterElement) {
             this._pressedElement = pressedElement;
+            this._enterElement = enterElement;
+            this.ClearJudgeEnv();
+            this.InitJudgeEnv();
             for (int i = 0; i < this._judgeRules.Count; i++) {
                 if (this._judgeRules[i].IsMathch()) {
                     return this._judgeRules[i];
@@ -51,7 +63,8 @@ namespace EGame.Core
             return null;
         }
 
-        private void InitJudgeEv() {
+        private void InitJudgeEnv() {
+            
             GameElement[,] elements = this._game.gameElements;
             var pressedElement = this._pressedElement;
             for (int i = pressedElement.x - 1; i >= 0; i--) {
@@ -78,6 +91,13 @@ namespace EGame.Core
                     this._downSameImageList.Add(e);
                 }
             }
+        }
+
+        private void ClearJudgeEnv() {
+            this._leftSameImageList.RemoveRange(0, this._leftSameImageList.Count);
+            this._rightSameImageList.RemoveRange(0, this._rightSameImageList.Count);
+            this._upSameImageList.RemoveRange(0, this._upSameImageList.Count);
+            this._downSameImageList.RemoveRange(0, this._downSameImageList.Count);
         }
     }   
 }

@@ -5,11 +5,9 @@ namespace EGame.Core
 {
     public class InitState : IState
     {
+        public string name { get { return "InitState"; } }
         private FSM _fsm = null;
         private EliminateGame _game = null;
-
-        public string name { get { return "InitState"; } }
-
 
         public InitState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;

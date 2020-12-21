@@ -72,68 +72,30 @@ namespace PuertsStaticWrap
         }
         
         [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
-        private static void M_ReplaceGameElementView(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
+        private static void M_PressedElement(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
         {
             try
             {
                 var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
                 
-                if (paramLen == 5)
+                
                 {
                     
                     var argHelper0 = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
-                    var argHelper1 = new Puerts.ArgumentHelper((int)data, isolate, info, 1);
-                    var argHelper2 = new Puerts.ArgumentHelper((int)data, isolate, info, 2);
-                    var argHelper3 = new Puerts.ArgumentHelper((int)data, isolate, info, 3);
-                    var argHelper4 = new Puerts.ArgumentHelper((int)data, isolate, info, 4);
                     
                     
-                    if (argHelper0.IsMatch(Puerts.JsValueType.Number, null, false, false)
-                        && argHelper1.IsMatch(Puerts.JsValueType.Number, null, false, false)
-                        && argHelper2.IsMatch(Puerts.JsValueType.Number, null, false, false)
-                        && argHelper3.IsMatch(Puerts.JsValueType.Number, null, false, false)
-                        && argHelper4.IsMatch(Puerts.JsValueType.Boolean, null, false, false))
+                    
                     {
                         
-                        var Arg0 = argHelper0.GetInt32(false);
-                        var Arg1 = argHelper1.GetInt32(false);
-                        var Arg2 = argHelper2.GetInt32(false);
-                        var Arg3 = argHelper3.GetInt32(false);
-                        var Arg4 = argHelper4.GetBoolean(false);
-                        obj.ReplaceGameElementView(Arg0,Arg1,Arg2,Arg3,Arg4);
+                        var Arg0 = argHelper0.Get<EGame.Core.IGameElementView>(false);
+                        obj.PressedElement(Arg0);
                         
                         
-                        return;
+                        
                     }
                 }
                 
-                if (paramLen == 4)
-                {
-                    
-                    var argHelper0 = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
-                    var argHelper1 = new Puerts.ArgumentHelper((int)data, isolate, info, 1);
-                    var argHelper2 = new Puerts.ArgumentHelper((int)data, isolate, info, 2);
-                    var argHelper3 = new Puerts.ArgumentHelper((int)data, isolate, info, 3);
-                    
-                    
-                    if (argHelper0.IsMatch(Puerts.JsValueType.Number, null, false, false)
-                        && argHelper1.IsMatch(Puerts.JsValueType.Number, null, false, false)
-                        && argHelper2.IsMatch(Puerts.JsValueType.Number, null, false, false)
-                        && argHelper3.IsMatch(Puerts.JsValueType.Number, null, false, false))
-                    {
-                        
-                        var Arg0 = argHelper0.GetInt32(false);
-                        var Arg1 = argHelper1.GetInt32(false);
-                        var Arg2 = argHelper2.GetInt32(false);
-                        var Arg3 = argHelper3.GetInt32(false);
-                        obj.ReplaceGameElementView(Arg0,Arg1,Arg2,Arg3);
-                        
-                        
-                        return;
-                    }
-                }
                 
-                Puerts.PuertsDLL.ThrowException(isolate, "invalid arguments to ReplaceGameElementView");
             }
             catch (Exception e)
             {
@@ -142,7 +104,167 @@ namespace PuertsStaticWrap
         }
         
         [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
-        private static void M_SetGameElementImageView(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
+        private static void M_EnterElement(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
+        {
+            try
+            {
+                var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
+                
+                
+                {
+                    
+                    var argHelper0 = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
+                    
+                    
+                    
+                    {
+                        
+                        var Arg0 = argHelper0.Get<EGame.Core.IGameElementView>(false);
+                        obj.EnterElement(Arg0);
+                        
+                        
+                        
+                    }
+                }
+                
+                
+            }
+            catch (Exception e)
+            {
+                Puerts.PuertsDLL.ThrowException(isolate, "c# exception:" + e.Message + ",stack:" + e.StackTrace);
+            }
+        }
+        
+        [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
+        private static void M_ReleaseElement(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
+        {
+            try
+            {
+                var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
+                
+                
+                {
+                    
+                    var argHelper0 = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
+                    
+                    
+                    
+                    {
+                        
+                        var Arg0 = argHelper0.Get<EGame.Core.IGameElementView>(false);
+                        obj.ReleaseElement(Arg0);
+                        
+                        
+                        
+                    }
+                }
+                
+                
+            }
+            catch (Exception e)
+            {
+                Puerts.PuertsDLL.ThrowException(isolate, "c# exception:" + e.Message + ",stack:" + e.StackTrace);
+            }
+        }
+        
+        [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
+        private static void M_LogInfo(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
+        {
+            try
+            {
+                var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
+                
+                
+                {
+                    
+                    var argHelper0 = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
+                    
+                    
+                    
+                    {
+                        
+                        var Arg0 = argHelper0.GetString(false);
+                        obj.LogInfo(Arg0);
+                        
+                        
+                        
+                    }
+                }
+                
+                
+            }
+            catch (Exception e)
+            {
+                Puerts.PuertsDLL.ThrowException(isolate, "c# exception:" + e.Message + ",stack:" + e.StackTrace);
+            }
+        }
+        
+        [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
+        private static void M_LogWarn(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
+        {
+            try
+            {
+                var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
+                
+                
+                {
+                    
+                    var argHelper0 = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
+                    
+                    
+                    
+                    {
+                        
+                        var Arg0 = argHelper0.GetString(false);
+                        obj.LogWarn(Arg0);
+                        
+                        
+                        
+                    }
+                }
+                
+                
+            }
+            catch (Exception e)
+            {
+                Puerts.PuertsDLL.ThrowException(isolate, "c# exception:" + e.Message + ",stack:" + e.StackTrace);
+            }
+        }
+        
+        [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
+        private static void M_LogErrr(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
+        {
+            try
+            {
+                var obj = Puerts.Utils.GetSelf((int)data, self) as EliminateGameController;
+                
+                
+                {
+                    
+                    var argHelper0 = new Puerts.ArgumentHelper((int)data, isolate, info, 0);
+                    
+                    
+                    
+                    {
+                        
+                        var Arg0 = argHelper0.GetString(false);
+                        obj.LogErrr(Arg0);
+                        
+                        
+                        
+                    }
+                }
+                
+                
+            }
+            catch (Exception e)
+            {
+                Puerts.PuertsDLL.ThrowException(isolate, "c# exception:" + e.Message + ",stack:" + e.StackTrace);
+            }
+        }
+        
+        [Puerts.MonoPInvokeCallback(typeof(Puerts.V8FunctionCallback))]
+        private static void M_CreateGameElementImageView(IntPtr isolate, IntPtr info, IntPtr self, int paramLen, long data)
         {
             try
             {
@@ -161,8 +283,8 @@ namespace PuertsStaticWrap
                         
                         var Arg0 = argHelper0.GetInt32(false);
                         var Arg1 = argHelper1.GetInt32(false);
-                        var Arg2 = argHelper2.Get<GameElementImageView>(false);
-                        obj.SetGameElementImageView(Arg0,Arg1,Arg2);
+                        var Arg2 = argHelper2.Get<GameElementView>(false);
+                        obj.CreateGameElementImageView(Arg0,Arg1,Arg2);
                         
                         
                         
@@ -348,8 +470,13 @@ namespace PuertsStaticWrap
                 Methods = new System.Collections.Generic.Dictionary<Puerts.MethodKey, Puerts.V8FunctionCallback>()
                 {
                     { new Puerts.MethodKey {Name = "CreateGameElementView", IsStatic = false},  M_CreateGameElementView },
-                    { new Puerts.MethodKey {Name = "ReplaceGameElementView", IsStatic = false},  M_ReplaceGameElementView },
-                    { new Puerts.MethodKey {Name = "SetGameElementImageView", IsStatic = false},  M_SetGameElementImageView },
+                    { new Puerts.MethodKey {Name = "PressedElement", IsStatic = false},  M_PressedElement },
+                    { new Puerts.MethodKey {Name = "EnterElement", IsStatic = false},  M_EnterElement },
+                    { new Puerts.MethodKey {Name = "ReleaseElement", IsStatic = false},  M_ReleaseElement },
+                    { new Puerts.MethodKey {Name = "LogInfo", IsStatic = false},  M_LogInfo },
+                    { new Puerts.MethodKey {Name = "LogWarn", IsStatic = false},  M_LogWarn },
+                    { new Puerts.MethodKey {Name = "LogErrr", IsStatic = false},  M_LogErrr },
+                    { new Puerts.MethodKey {Name = "CreateGameElementImageView", IsStatic = false},  M_CreateGameElementImageView },
                     { new Puerts.MethodKey {Name = "ConvertElementToUnityPos", IsStatic = false},  M_ConvertElementToUnityPos },
                     
                 },

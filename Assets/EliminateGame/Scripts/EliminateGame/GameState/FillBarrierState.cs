@@ -6,10 +6,9 @@ namespace EGame.Core
 {
     public class FillBarrierState : IState
     {
+        public string name { get { return "FillBarrierState"; } }
         private FSM _fsm = null;
         private EliminateGame _game = null;
-
-        public string name { get { return "FillBarrierState"; } }
 
         public FillBarrierState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;

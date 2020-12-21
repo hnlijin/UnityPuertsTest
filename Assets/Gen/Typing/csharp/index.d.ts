@@ -192,6 +192,10 @@ declare module 'csharp' {
         class Renderer extends UnityEngine.Component {
             
         }
+        /** Represents a Sprite object for use in 2D gameplay. */
+        class Sprite extends UnityEngine.Object {
+            
+        }
         /** Representation of 3D vectors and points. */
         class Vector3 extends System.ValueType {
             
@@ -244,6 +248,13 @@ declare module 'csharp' {
             
         }
         
+        type MulticastDelegate = (...args:any[]) => any;
+        var MulticastDelegate: {new (func: (...args:any[]) => any): MulticastDelegate;}
+        
+        class Delegate extends System.Object {
+            
+        }
+        
     }
     namespace System.Reflection {
         
@@ -272,12 +283,7 @@ declare module 'csharp' {
             
             public spriteRenderer: UnityEngine.SpriteRenderer;
             
-            public get imageId(): number;
-            public set imageId(value: number);
-            
             public constructor();
-            
-            public RemoveImage():void;
             
         }
         
@@ -285,19 +291,29 @@ declare module 'csharp' {
             
             public elementType: EGame.Core.GameElementType;
             
-            public get imageView(): EGame.Core.IGameElementImageView;
-            public set imageView(value: EGame.Core.IGameElementImageView);
+            public get x(): number;
+            
+            public get y(): number;
             
             public get gameController(): EliminateGameController;
             public set gameController(value: EliminateGameController);
             
+            public get imageId(): number;
+            public set imageId(value: number);
+            
             public constructor();
             
-            public MoveElement($targetX: number, $targetY: number, $time: number):void;
+            public Init($x: number, $y: number):void;
             
-            public SetImageView($x: number, $y: number):void;
+            public MoveElement($targetX: number, $targetY: number, $time: number, $callback: EGame.Core.IElementMoveEndCallback):void;
+            
+            public CreateImageView($x: number, $y: number):void;
+            
+            public UpdateImageView($imageId: number, $sprite: UnityEngine.Sprite):void;
             
             public DestroyView():void;
+            
+            public DestroyImageView():void;
             
         }
         
@@ -313,11 +329,21 @@ declare module 'csharp' {
             
             public constructor();
             
-            public CreateGameElementView($x: number, $y: number, $elementType: EGame.Core.GameElementType):GameElementView;
+            public CreateGameElementView($x: number, $y: number, $elementType: EGame.Core.GameElementType):EGame.Core.IGameElementView;
             
-            public ReplaceGameElementView($oldX: number, $oldY: number, $targetX: number, $targetY: number, $onlyUpdateName?: boolean):void;
+            public PressedElement($elementView: EGame.Core.IGameElementView):void;
             
-            public SetGameElementImageView($x: number, $y: number, $imageView: GameElementImageView):void;
+            public EnterElement($elementView: EGame.Core.IGameElementView):void;
+            
+            public ReleaseElement($elementView: EGame.Core.IGameElementView):void;
+            
+            public LogInfo($info: string):void;
+            
+            public LogWarn($warn: string):void;
+            
+            public LogErrr($error: string):void;
+            
+            public CreateGameElementImageView($x: number, $y: number, $elementView: GameElementView):void;
             
             public ConvertElementToUnityPos($x: number, $y: number):UnityEngine.Vector3;
             
@@ -330,9 +356,12 @@ declare module 'csharp' {
     
     namespace EGame.Core {
         
-        enum GameElementType { Grid = -1, Empty = 0, Normal = 1, Barrier = 2, Any = 3, Same = 4 }
+        enum GameElementType { Null = -2, Grid = -1, Empty = 0, Normal = 1, Barrier = 2, Any = 3, Same = 4 }
         
-        interface IGameElementImageView {
+        type IElementMoveEndCallback = (target: EGame.Core.IGameElementView) => void;
+        var IElementMoveEndCallback: {new (func: (target: EGame.Core.IGameElementView) => void): IElementMoveEndCallback;}
+        
+        interface IGameElementView {
             
         }
         

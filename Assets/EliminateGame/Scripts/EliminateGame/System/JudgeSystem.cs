@@ -20,6 +20,8 @@ namespace EGame.Core
         private EliminateGame _game = null;
         private List<IJudgeRule> _judgeRules = null;
 
+        private IGameElementView _pressedElement = null;
+
         public JudgeSystem(EliminateGame game) {
             this._game = game;
             this._leftSameImageList = new List<GameElement>();
@@ -39,7 +41,8 @@ namespace EGame.Core
             }
         }
 
-        public IJudgeRule StartJudge() {
+        public IJudgeRule StartJudge(IGameElementView pressedElement) {
+            this._pressedElement = pressedElement;
             for (int i = 0; i < this._judgeRules.Count; i++) {
                 if (this._judgeRules[i].IsMathch()) {
                     return this._judgeRules[i];
@@ -50,7 +53,7 @@ namespace EGame.Core
 
         private void InitJudgeEv() {
             GameElement[,] elements = this._game.gameElements;
-            var pressedElement = this._game.pressedElement;
+            var pressedElement = this._pressedElement;
             for (int i = pressedElement.x - 1; i >= 0; i--) {
                 GameElement e = elements[i, pressedElement.y];
                 if (pressedElement.imageId == e.elementView.imageId) {

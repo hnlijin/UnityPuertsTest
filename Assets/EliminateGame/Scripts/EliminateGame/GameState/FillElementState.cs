@@ -6,12 +6,11 @@ namespace EGame.Core
 {
     public class FillElementState : IState
     {
+        public string name { get { return "FillElementState"; } }
         private FSM _fsm;
         private EliminateGame _game;
         private bool _startFill = false;
         private float _frameTime = 0.1f;
-
-        public string name { get { return "FillElementState"; } }
 
         public FillElementState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;

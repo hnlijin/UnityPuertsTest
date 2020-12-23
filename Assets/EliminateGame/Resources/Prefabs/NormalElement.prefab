@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 4393493821448604}
   - component: {fileID: 65622222828975522}
   - component: {fileID: 5915692788845526301}
-  - component: {fileID: 634031781757123384}
+  - component: {fileID: 5639178828160369556}
   m_Layer: 0
-  m_Name: NormalSweet
+  m_Name: NormalElement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59,20 +59,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d942c38f520b15428d925ea5f4b351f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 212219008658775184}
   elementType: 1
---- !u!114 &634031781757123384
-MonoBehaviour:
+--- !u!111 &5639178828160369556
+Animation:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1360093070950852}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00ff9a2e2adc58840a39b328ef86c1f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 212219008658775184}
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: 8dd69214b40d0d4459371c5c61f12bf3, type: 2}
+  - {fileID: 7400000, guid: 3f3dcb696236df24d98db61efdea4f12, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &1412641706153842
 GameObject:
   m_ObjectHideFlags: 0
@@ -84,7 +89,7 @@ GameObject:
   - component: {fileID: 4287522772040584}
   - component: {fileID: 212219008658775184}
   m_Layer: 0
-  m_Name: Sweet
+  m_Name: Color
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -119,7 +124,6 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

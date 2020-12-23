@@ -10,11 +10,20 @@ namespace EGame.Core
         Empty,
         Normal, // 普通元素: 可以移动
         Barrier, // 障碍元素: 不可移动
-        Any, // 任意元素: 可整行、列匹配
-        Same, // 同色元素: 可消除同一种颜色所有甜点
+        AnyRow, // 消除任意行元素: 可整行消除
+        AnyColumn, // 消除任意列元素: 可整列消除
+        Same, // 消除同色元素: 可消除同一种颜色的所有元素
+    }
+
+    public class GameElementAnimation
+    {
+        public static string DropBack = "dropBack"; // 下落回弹
+        public static string Appear = "appear"; // 出现动画
+        public static string Disappear = "disappear";  // 消失动画
     }
 
     public delegate void IElementMoveEndCallback(IGameElementView target);
+    public delegate void IAnimationPlayCompleteCallback(IGameElementView target, string name);
 
     public interface IGameElementView {
         int x { get; }
@@ -25,6 +34,7 @@ namespace EGame.Core
         int imageId { set; get; }
         void CreateImageView(int x, int y);
         void DestroyImageView();
+        void PlayAnimation(string name, IAnimationPlayCompleteCallback callback);
     }
 
     public class GameElement
@@ -65,7 +75,8 @@ namespace EGame.Core
         public bool CanMove() {
             if (this._elementType == GameElementType.Barrier || 
             this._elementType == GameElementType.Empty || 
-            this._elementType == GameElementType.Grid) {
+            this._elementType == GameElementType.Grid ||
+            this._elementType == GameElementType.Null) {
                 return false;
             }
             return true;

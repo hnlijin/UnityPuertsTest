@@ -4,6 +4,7 @@ using System;
 
 namespace EGame.Core
 {
+    // 交换元素状态
     public class ExchangeElementState : IState
     {
         public string name { get { return "ExchangeElementState"; } }
@@ -14,6 +15,8 @@ namespace EGame.Core
         private bool _nowCanMoveElement = true;          // 元素是否可以滑动
         private IGameElementView _pressedElement = null; // 按下元素
         private IGameElementView _enterElement = null;   // 滑入元素
+        private float _timeout = 0;
+        private TimeoutCallback _timeoutCallback = null;
 
         public ExchangeElementState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;
@@ -43,13 +46,26 @@ namespace EGame.Core
         {
             if (this._pressedElement != null && this._enterElement != null && this._nowCanMoveElement == true) {
                 this._nowCanMoveElement = false;
-                this._game.gameController.LogInfo("PressedElement: " + string.Format(", P: {0}/{1}", this._pressedElement.x, this._pressedElement.y));
-                this._game.gameController.LogInfo("EnterElement: " + string.Format(", P: {0}/{1}", this._enterElement.x, this._enterElement.y));
+                this.CheckSelectElementError();
                 if (this.JudgeAround(this._pressedElement, this._enterElement)) {
                     this.ExchangeElement();
                 } else {
                     this.ResetMoveElementState();
                 }
+            }
+        }
+
+        private void CheckSelectElementError() {
+            GameElement[,] elements = this._game.gameElements;
+            var element1 = elements[this._pressedElement.x, this._pressedElement.y];
+            var element2 = elements[this._enterElement.x, this._enterElement.y];
+            if (element1.x != this._pressedElement.x || element1.y != this._pressedElement.y) {
+                this._game.gameController.LogInfo("PressedElement: " + string.Format(", P: {0}/{1}", this._pressedElement.x, this._pressedElement.y));
+                this._game.gameController.LogError("Element: Pos Error, " + string.Format(", P: {0}/{1}", element2.x, element2.y));
+            }
+            if (element2.x != this._enterElement.x || element2.y != this._enterElement.y) {
+                this._game.gameController.LogInfo("EnterElement: " + string.Format(", P: {0}/{1}", this._enterElement.x, this._enterElement.y));
+                this._game.gameController.LogError("Element: Pos Error, " + string.Format(", P: {0}/{1}", element2.x, element2.y));
             }
         }
 
@@ -70,31 +86,14 @@ namespace EGame.Core
         }
 
         private void PressedElementMoveEnd(IGameElementView view) {
-            IJudgeRule judge = this._game.judgeSystem.StartJudge(this._pressedElement, this._enterElement);
+            IJudgeRule judge = this._game.judgeSystem.StartJudge(this._pressedElement, this._enterElement, JudgeType.Active);
+            if (judge == null) {
+                judge = this._game.judgeSystem.StartJudge(this._enterElement, this._pressedElement, JudgeType.Active);
+            }
             if (judge == null) {
                 this.RevertElement();
             } else {
-                this.ResetMoveElementState();
-                GameElement[] clearElements = judge.GetClearElements();
-                this.ClearElement(clearElements);
-                if (judge.newElementType > GameElementType.Null) {
-                    GameElement[,] elements = this._game.gameElements;
-                    var element1 = elements[this._element2X, this._element2Y];
-                    element1.Init(element1.x, element1.y, judge.newElementType);
-                    if (judge.newElementType == GameElementType.Normal) {
-                        element1.elementView.CreateImageView(element1.x, element1.y);
-                    }
-                }
-                this._fsm.ChangeState(new FillElementState(this._fsm, this._game));
-            }
-        }
-
-        private void ClearElement(GameElement[] clearElements) {
-            if (clearElements == null) return;
-            for (int i = 0;  i < clearElements.Length; i++) {
-                GameElement e = clearElements[i];
-                e.Init(e.x, e.y, GameElementType.Empty);
-                e.elementView = this._game.gameController.CreateGameElementView(e.x, e.y, GameElementType.Empty);
+                this._fsm.ChangeState(new ExeJudgeState(this._fsm, this._game, judge, ExeJudgeFrom.Exchange));
             }
         }
 
@@ -129,9 +128,24 @@ namespace EGame.Core
             this._nowCanMoveElement = true;
         }
 
+        private void SetTimeout(float time, TimeoutCallback callback) {
+            if (this._timeoutCallback != null || this._timeout > 0) return;
+            this._timeout = time;
+            this._timeoutCallback = callback;
+        }
+
         public void Update(float deltaTime)
         {
-            
+            if (this._timeout > 0) {
+                this._timeout -= deltaTime;
+                if (this._timeout <= 0) {
+                    if (this._timeoutCallback != null) {
+                        var callback = this._timeoutCallback;
+                        this._timeoutCallback = null;
+                        callback();
+                    }
+                }
+            }
         }
 
         public void Exit() {
@@ -139,6 +153,8 @@ namespace EGame.Core
             this._game.onPressedElement -= this.OnPressedElement;
             this._game.onEnterElement -= this.OnEnterElement;
             this._game.onReleaseElement -= this.OnReleaseElement;
+            this._timeout = 0;
+            this._timeoutCallback = null;
         }
     }
 }

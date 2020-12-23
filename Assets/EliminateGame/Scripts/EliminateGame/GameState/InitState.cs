@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace EGame.Core
 {
+    // 初始化网格和空元素状态
     public class InitState : IState
     {
         public string name { get { return "InitState"; } }

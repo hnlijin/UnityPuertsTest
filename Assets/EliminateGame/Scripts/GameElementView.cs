@@ -1,44 +1,34 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using EGame.Core;
 
 public class GameElementView : MonoBehaviour, IGameElementView
 {
+    public SpriteRenderer spriteRenderer;
     public int x { get { return this._x; } }
     public int y { get { return this._y; } }
-    public GameElementType elementType;
+    public GameElementType elementType = GameElementType.Null;
     public EliminateGameController gameController { set; get; }
-    private GameElementImageView _gameImageView = null;
+    public int imageId { set; get; }
     private Coroutine _moveCoroutine = null;
     private IElementMoveEndCallback _moveEndCallback = null;
-    private int _x = 0;
-    private int _y = 0;
-    public int imageId { set; get; }
+    private IAnimationPlayCompleteCallback _aniPlayComplete = null;
+    private int _x = 0, _y = 0;
+    private Animation _animation = null;
 
     void Awake() {
-        this._gameImageView = GetComponent<GameElementImageView>();
+        this._animation = this.GetComponent<Animation>();
     }
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
+    
     private void OnMouseDown()
     {
-        Debug.Log("OnMouseDown: " + this.gameObject.name + string.Format(", P: {0}/{1}", this.x, this.y));
+        // Debug.Log("OnMouseDown: " + this.gameObject.name + string.Format(", P: {0}/{1}", this.x, this.y));
         this.gameController.PressedElement(this);
     }
 
     private void OnMouseEnter()
     {
-        Debug.Log("OnMouseEnter: " + this.gameObject.name + string.Format(", P: {0}/{1}", this.x, this.y));
+        // Debug.Log("OnMouseEnter: " + this.gameObject.name + string.Format(", P: {0}/{1}", this.x, this.y));
         this.gameController.EnterElement(this);
     }    
 
@@ -50,6 +40,36 @@ public class GameElementView : MonoBehaviour, IGameElementView
     public void Init(int x, int y) {
         this._x = x;
         this._y = y;
+    }
+
+    public void PlayAnimation(string name, IAnimationPlayCompleteCallback callback) {
+        this._aniPlayComplete = callback;
+        if (name == GameElementAnimation.DropBack) {
+            if (this._animation != null) {
+                this._animation.Play("ElementDropBack");
+            } else if (callback != null) {
+                Debug.LogError("PlayAnimation: name = " + this.gameObject.name + ", ElementDropBack.name = " + name);
+                callback(this, null);
+            }
+        } else if (name == GameElementAnimation.Disappear) {
+            if (this._animation != null) {
+                this._animation.Play("ElementBlinkDisappear");
+            } else if (callback != null) {
+                Debug.LogError("PlayAnimation: name = " + this.gameObject.name + ", ElementBlinkDisappear.name = " + name);
+                callback(this, null);
+            }
+        } else if (callback != null) {
+            callback(this, null);
+        }
+    }
+
+    public void AnimationPlayComplete(string name) {
+        // Debug.Log("AnimationPlayComplete: name = " + this.gameObject.name + ", name = " + name);
+        var callback = this._aniPlayComplete;
+        if (callback != null) {
+            this._aniPlayComplete = null;
+            callback(this, name);
+        }
     }
 
     public void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback)
@@ -96,13 +116,13 @@ public class GameElementView : MonoBehaviour, IGameElementView
 
     public void CreateImageView(int x, int y)
     {
-        gameController.CreateGameElementImageView(x, y, this);
+        this.gameController.CreateGameElementImageView(x, y, this);
     }
 
     public void UpdateImageView(int imageId, Sprite sprite) {
         this.imageId = imageId;
-        if (this._gameImageView != null) {
-            this._gameImageView.spriteRenderer.sprite = sprite;
+        if (this.spriteRenderer != null) {
+            this.spriteRenderer.sprite = sprite;
         }
     }
 
@@ -111,6 +131,6 @@ public class GameElementView : MonoBehaviour, IGameElementView
     }
 
     public void DestroyImageView() {
-        Destroy(this._gameImageView.gameObject);
+        this.spriteRenderer.sprite = null;
     }
 }

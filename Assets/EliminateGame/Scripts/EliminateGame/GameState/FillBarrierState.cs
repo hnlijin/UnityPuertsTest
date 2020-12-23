@@ -4,6 +4,7 @@ using System;
 
 namespace EGame.Core
 {
+    // 填充障碍物状态
     public class FillBarrierState : IState
     {
         public string name { get { return "FillBarrierState"; } }
@@ -18,7 +19,7 @@ namespace EGame.Core
         public void Enter()
         {
             Random random = new Random();
-            int barrierCount = 10;
+            int barrierCount = 3;
             int cols = this._game.elementCols;
             int rows = this._game.elementRows;
             GameElement[,] elements = this._game.gameElements;

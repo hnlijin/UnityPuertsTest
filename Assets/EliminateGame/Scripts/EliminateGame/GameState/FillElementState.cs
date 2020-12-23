@@ -4,6 +4,7 @@ using System;
 
 namespace EGame.Core
 {
+    // 填充元素
     public class FillElementState : IState
     {
         public string name { get { return "FillElementState"; } }
@@ -111,13 +112,19 @@ namespace EGame.Core
                     // 配置元素属性
                     element.Init(x, y, GameElementType.Normal);
                     element.MoveElement(x, y, this._game.fillTime, null);
-                    if (element.elementView != null) {
+                    if (element.elementView != null && element.elementType == GameElementType.Normal) {
                         element.elementView.CreateImageView(x, y);
                     }
                     filledNotFinished = true;
                 }
             }
             return filledNotFinished;
+        }
+
+        private void PlayDropBackAnimation(IGameElementView target) {
+            GameElement[,] elements = this._game.gameElements;
+            var element = elements[target.x, target.y];
+            element.elementView.PlayAnimation(GameElementAnimation.DropBack, null);
         }
 
         public void Update(float deltaTime)
@@ -128,7 +135,11 @@ namespace EGame.Core
                     this._frameTime = 0;
                     if (!this.FillElement()) {
                         this._startFill = false;
-                        this._game.OnFillElementComplete();
+                        if (this._fsm.hasNextState) {
+                            this._fsm.NextState();
+                        } else {
+                            this._game.OnFillElementComplete();
+                        }
                     }
                 }
             }

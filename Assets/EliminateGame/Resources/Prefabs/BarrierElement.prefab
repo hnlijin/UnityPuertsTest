@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4164174534085270}
   - component: {fileID: 3650556445458789893}
   m_Layer: 0
-  m_Name: BarrierSweet
+  m_Name: BarrierElement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d942c38f520b15428d925ea5f4b351f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 0}
   elementType: 2
 --- !u!1 &1746136030223610
 GameObject:
@@ -57,7 +58,7 @@ GameObject:
   - component: {fileID: 4420605303358262}
   - component: {fileID: 212327158895892816}
   m_Layer: 0
-  m_Name: Sweet
+  m_Name: Color
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -138,7 +139,7 @@ GameObject:
   - component: {fileID: 4795790882024084}
   - component: {fileID: 212067623540092312}
   m_Layer: 0
-  m_Name: Sweet
+  m_Name: Color
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

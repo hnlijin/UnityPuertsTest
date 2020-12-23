@@ -3,10 +3,39 @@ using System.Collections.Generic;
 
 namespace EGame.Core
 {
+    public enum Direction
+    {
+        Null, // 无
+        Horizontal, // 水平
+        Vertical, // 垂直
+        Cross, // 相交
+        All, // 所有方向
+    }
+    public struct NewElement {
+        public GameElement oldElement;
+        public GameElementType newElementType;
+    }
+
+    public struct ChangeElement {
+        public GameElement element;
+        public GameElementType newElementType;
+    }
+
+    public enum JudgeType
+    {
+        Null,
+        Active,   // 玩家主动触发
+        System,   // 系统触发
+    }
+
     public interface IJudgeRule {
         bool IsMathch();
-        GameElementType newElementType { get; }
+        int selectedElementX { get; }
+        int selectedElementY { get; }
+        GameElementType selectedElementType { get; }
         GameElement[] GetClearElements();
+        ChangeElement[] GetChangeElements();
+        NewElement[] GetNewElements();
     }
 
     /** 判定系统 */
@@ -19,15 +48,17 @@ namespace EGame.Core
 
         private EliminateGame _game = null;
         private List<IJudgeRule> _judgeRules = null;
-        private IGameElementView _pressedElement = null;
-        private IGameElementView _enterElement = null;
+        private IGameElementView _selectedElement = null;
+        private IGameElementView _otherElement = null;
+        private JudgeType _judgeType = JudgeType.Null;
 
         public List<GameElement> leftSameImageList { get { return this._leftSameImageList; } }
         public List<GameElement> rightSameImageList { get { return this._rightSameImageList; } }
         public List<GameElement> upSameImageList { get { return this._upSameImageList; } }
         public List<GameElement> downSameImageList { get { return this._downSameImageList; } }
-        public IGameElementView pressedElement { get { return this._pressedElement; }}
-        public IGameElementView enterElement { get { return this._enterElement; }}
+        public IGameElementView selectedElement { get { return this._selectedElement; }}
+        public IGameElementView otherElement { get { return this._otherElement; }}
+        public JudgeType judgeType { get { return this._judgeType; } }
 
         public EliminateGame game { get { return this._game; } }
 
@@ -50,54 +81,62 @@ namespace EGame.Core
             }
         }
 
-        public IJudgeRule StartJudge(IGameElementView pressedElement, IGameElementView enterElement) {
-            this._pressedElement = pressedElement;
-            this._enterElement = enterElement;
+        public IJudgeRule StartJudge(IGameElementView selectedElement, IGameElementView otherElement, JudgeType judgeType) {
             this.ClearJudgeEnv();
+            this._selectedElement = selectedElement;
+            this._otherElement = otherElement;
+            this._judgeType = judgeType;
             this.InitJudgeEnv();
+            IJudgeRule judge = null;
             for (int i = 0; i < this._judgeRules.Count; i++) {
                 if (this._judgeRules[i].IsMathch()) {
-                    return this._judgeRules[i];
+                    judge = this._judgeRules[i];
+                    break;
                 }
             }
-            return null;
+            return judge;
         }
 
         private void InitJudgeEnv() {
-            
             GameElement[,] elements = this._game.gameElements;
-            var pressedElement = this._pressedElement;
-            for (int i = pressedElement.x - 1; i >= 0; i--) {
-                GameElement e = elements[i, pressedElement.y];
-                if (pressedElement.imageId == e.elementView.imageId) {
-                    this._leftSameImageList.Add(e);
+            var selectedElement = this._selectedElement;
+            for (int i = selectedElement.x - 1; i >= 0; i--) {
+                GameElement e = elements[i, selectedElement.y];
+                if (e.elementType != GameElementType.Normal || selectedElement.imageId != e.elementView.imageId) {
+                    break;
                 }
+                this._leftSameImageList.Add(e);
             }
-            for (int i = pressedElement.x + 1; i < this._game.elementCols; i++) {
-                GameElement e = elements[i, pressedElement.y];
-                if (pressedElement.imageId == e.elementView.imageId) {
-                    this._rightSameImageList.Add(e);
+            for (int i = selectedElement.x + 1; i < this._game.elementCols; i++) {
+                GameElement e = elements[i, selectedElement.y];
+                if (e.elementType != GameElementType.Normal || selectedElement.imageId != e.elementView.imageId) {
+                    break;
                 }
+                this._rightSameImageList.Add(e);
             }
-            for (int j = pressedElement.y - 1; j >= 0; j--) {
-                GameElement e = elements[pressedElement.x, j];
-                if (pressedElement.imageId == e.elementView.imageId) {
-                    this._upSameImageList.Add(e);
+            for (int j = selectedElement.y - 1; j >= 0; j--) {
+                GameElement e = elements[selectedElement.x, j];
+                if (e.elementType != GameElementType.Normal || selectedElement.imageId != e.elementView.imageId) {
+                    break;
                 }
+                this._upSameImageList.Add(e);
             }
-            for (int j = pressedElement.y + 1; j < this._game.elementRows; j++) {
-                GameElement e = elements[pressedElement.x, j];
-                if (pressedElement.imageId == e.elementView.imageId) {
-                    this._downSameImageList.Add(e);
+            for (int j = selectedElement.y + 1; j < this._game.elementRows; j++) {
+                GameElement e = elements[selectedElement.x, j];
+                if (e.elementType != GameElementType.Normal || selectedElement.imageId != e.elementView.imageId) {
+                    break;
                 }
+                this._downSameImageList.Add(e);
             }
         }
 
-        private void ClearJudgeEnv() {
+        public void ClearJudgeEnv() {
             this._leftSameImageList.RemoveRange(0, this._leftSameImageList.Count);
             this._rightSameImageList.RemoveRange(0, this._rightSameImageList.Count);
             this._upSameImageList.RemoveRange(0, this._upSameImageList.Count);
             this._downSameImageList.RemoveRange(0, this._downSameImageList.Count);
+            this._selectedElement = null;
+            this._judgeType = JudgeType.Null;
         }
     }   
 }

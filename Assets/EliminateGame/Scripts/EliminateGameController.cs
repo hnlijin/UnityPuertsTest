@@ -30,7 +30,7 @@ public class EliminateGameController : MonoBehaviour , IEliminateGameController
                 parent = this.gridContainer.transform;
                 elementName = "grid:" + x + "_" + y;
             }
-            var view = Instantiate(elementPrefab, ConvertElementToUnityPos(x, y), Quaternion.identity, parent);
+            var view = Instantiate(elementPrefab, this.ConvertElementToUnityPos(x, y), Quaternion.identity, parent);
             view.Init(x, y);
             view.gameObject.name = elementName;
             view.gameController = this;
@@ -58,7 +58,7 @@ public class EliminateGameController : MonoBehaviour , IEliminateGameController
         UnityEngine.Debug.LogWarning("EGame: " + warn);
     }
 
-    public void LogErrr(string error) {
+    public void LogError(string error) {
         UnityEngine.Debug.LogError("EGame:" + error);
     }
 

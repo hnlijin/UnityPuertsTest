@@ -11,7 +11,6 @@ public class GameElementView : MonoBehaviour, IGameElementView
     public EliminateGameController gameController { set; get; }
     public int imageId { set; get; }
     private Coroutine _moveCoroutine = null;
-    private IElementMoveEndCallback _moveEndCallback = null;
     private IAnimationPlayCompleteCallback _aniPlayComplete = null;
     private int _x = 0, _y = 0;
     private Animation _animation = null;
@@ -72,11 +71,10 @@ public class GameElementView : MonoBehaviour, IGameElementView
         }
     }
 
-    public void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback)
+    public void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback, GameElement[] paths)
     {
         this._x = targetX;
         this._y = targetY;
-        this._moveEndCallback = callback;
         this.gameObject.name = "element:" + targetX + "_" + targetY;
         if (this._moveCoroutine != null) {
             StopCoroutine(this._moveCoroutine);
@@ -85,17 +83,27 @@ public class GameElementView : MonoBehaviour, IGameElementView
         if (time <= 0) {
             Vector3 pos = this.gameController.ConvertElementToUnityPos(targetX, targetY);
             this.transform.position = pos;
-            if (this._moveEndCallback != null) {
-                var callback1 = this._moveEndCallback;
-                this._moveEndCallback = null;
-                callback1(this);
+            if (callback != null) {
+                callback(this);
             }
             return;
         }
-        this._moveCoroutine = StartCoroutine(MoveCoroutine(targetX, targetY, time));
+        if (paths != null && paths.Length > 0) {
+            this._moveCoroutine = StartCoroutine(MovePathCoroutine(targetX, targetY, time, callback, paths));
+            return;
+        }
+        this._moveCoroutine = StartCoroutine(MoveCoroutine(targetX, targetY, time, callback));
     }
 
-    IEnumerator MoveCoroutine(int targetX, int targetY, float time)
+    IEnumerator MovePathCoroutine(int targetX, int targetY, float time, IElementMoveEndCallback callback, GameElement[] paths) {
+        for (int i = 0; i < paths.Length; i++) {
+            GameElement e = paths[i];
+            yield return StartCoroutine(MoveCoroutine(e.x, e.y, time, null));
+        }
+        yield return StartCoroutine(MoveCoroutine(targetX, targetY, time, null));
+    }
+
+    IEnumerator MoveCoroutine(int targetX, int targetY, float time, IElementMoveEndCallback callback)
     {
         //实际坐标
         Vector3 endPos = this.gameController.ConvertElementToUnityPos(targetX, targetY);
@@ -106,10 +114,8 @@ public class GameElementView : MonoBehaviour, IGameElementView
             yield return 0;
         }
         this.transform.position = endPos;
-        if (this._moveEndCallback != null) {
-            var callback1 = this._moveEndCallback;
-            this._moveEndCallback = null;
-            callback1(this);
+        if (callback != null) {
+            callback(this);
         }
         yield break;
     }

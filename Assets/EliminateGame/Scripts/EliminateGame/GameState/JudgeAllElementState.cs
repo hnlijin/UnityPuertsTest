@@ -10,7 +10,7 @@ namespace EGame.Core
         private FSM _fsm = null;
         private EliminateGame _game = null;
         private float _timeout = 0;
-        private TimeoutCallback _timeoutCallback = null;
+        private Callback _timeoutCallback = null;
 
         public JudgeAllElementState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;
@@ -46,7 +46,7 @@ namespace EGame.Core
             }
         }
 
-        private void SetTimeout(float time, TimeoutCallback callback) {
+        private void SetTimeout(float time, Callback callback) {
             if (this._timeoutCallback != null || this._timeout > 0) return;
             this._timeout = time;
             this._timeoutCallback = callback;

@@ -29,7 +29,7 @@ namespace EGame.Core
         int x { get; }
         int y { get; }
         void Init(int x, int y);
-        void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback);
+        void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback, GameElement[] paths);
         void DestroyView();
         int imageId { set; get; }
         void CreateImageView(int x, int y);
@@ -82,11 +82,11 @@ namespace EGame.Core
             return true;
         }
 
-        public void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback) {
+        public void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback, GameElement[] paths) {
             this._x = targetX;
             this._y = targetY;
             if (this.CanMove()) {
-                this._elementView.MoveElement(targetX, targetY, time, callback);
+                this._elementView.MoveElement(targetX, targetY, time, callback, paths);
             } else if (callback != null) {
                 callback(null);
             }

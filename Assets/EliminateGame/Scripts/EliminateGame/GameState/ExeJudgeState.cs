@@ -19,7 +19,7 @@ namespace EGame.Core
         private ExeJudgeFrom _from = ExeJudgeFrom.Null;
         private IJudgeRule _judge = null;
         private float _timeout = 0;
-        private TimeoutCallback _timeoutCallback = null;
+        private Callback _timeoutCallback = null;
 
         public ExeJudgeState(FSM fsm, EliminateGame game, IJudgeRule judge, ExeJudgeFrom from) {
             this._fsm = fsm;
@@ -83,7 +83,7 @@ namespace EGame.Core
             clearElement.elementView = this._game.gameController.CreateGameElementView(clearElement.x, clearElement.y, GameElementType.Empty);
         }
 
-        private void SetTimeout(float time, TimeoutCallback callback) {
+        private void SetTimeout(float time, Callback callback) {
             if (this._timeoutCallback != null || this._timeout > 0) return;
             this._timeout = time;
             this._timeoutCallback = callback;

@@ -15,7 +15,6 @@ namespace EGame.Core
         void LogError(string error);
     }
 
-    public delegate void TimeoutCallback();
     public delegate void Callback();
     public delegate void PressedElement(IGameElementView elementView);
     public delegate void EnterElement(IGameElementView elementView);
@@ -35,6 +34,7 @@ namespace EGame.Core
         private GameElement[,] _elements = null;
         private IEliminateGameController _gameController = null;        
         private JudgeSystem _judgeSystem = null;
+        private Timer _timer = null;
 
         public GameElement[,] gameElements { get { return this._elements; } }
         public int elementCols { get { return this._elementCols; } }
@@ -42,8 +42,11 @@ namespace EGame.Core
         public IEliminateGameController gameController { get { return this._gameController; } }
         public FSM fsm { get { return this._fsm; } }
         public JudgeSystem judgeSystem { get { return this._judgeSystem; } }
+
+        public bool enableSyncFill { set; get; } // 开始同步填充：新生和移动同步下落
         
         public EliminateGame() {
+            this._timer = new Timer();
             this._fsm = new FSM();
             this._judgeSystem = new JudgeSystem(this);
             this._judgeSystem.RegJudgeRule(new SameColorXiaoJudgeRule(this._judgeSystem));
@@ -66,6 +69,7 @@ namespace EGame.Core
         }
 
         public void OnFillElementComplete() {
+            this.enableSyncFill = false;
             this._fsm.SetNextState(new ExchangeElementState(this._fsm, this));
             this._fsm.ChangeState(new JudgeAllElementState(this._fsm, this));
         }
@@ -74,8 +78,15 @@ namespace EGame.Core
             this._elementRows = elementRows;
             this._elementCols = elementCols;
             this._gameController = gameController;
+            this.enableSyncFill = true;
             this._fsm.SetNextState(new FillBarrierState(this._fsm, this));
+            // this._fsm.SetNextState(new FillElementState(this._fsm, this));
             this._fsm.ChangeState(new InitState(this._fsm, this));
+        }
+
+        public void Reset() {
+            this._fsm.SetNextState(new FillElementState(this._fsm, this));
+            this._fsm.ChangeState(new ResetState(this._fsm, this));
         }
 
         public void PressedElement(IGameElementView element) {
@@ -98,10 +109,19 @@ namespace EGame.Core
             }
         }
 
+        public void SetTimeout(float time, TimeoutCallback callback) {
+            this._timer.SetTimeout(time, callback);
+        }
+
+        public void ClearTimeout(TimeoutCallback callback) {
+            this._timer.ClearTimeout(callback);
+        }
+
         public void Start() {
         }
 
         public void Update(float deltaTime) {
+            this._timer.Update(deltaTime);
             this._fsm.Update(deltaTime);
         }
 

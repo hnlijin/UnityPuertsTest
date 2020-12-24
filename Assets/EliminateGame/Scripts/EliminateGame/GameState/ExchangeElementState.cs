@@ -15,6 +15,7 @@ namespace EGame.Core
         private bool _nowCanMoveElement = true;          // 元素是否可以滑动
         private IGameElementView _pressedElement = null; // 按下元素
         private IGameElementView _enterElement = null;   // 滑入元素
+        private IGameElementView _lastEnterElement = null;
         private float _timeout = 0;
         private TimeoutCallback _timeoutCallback = null;
 
@@ -38,21 +39,28 @@ namespace EGame.Core
 
         private void OnEnterElement(IGameElementView element)
         {
+            this._lastEnterElement = element;
             if (this._nowCanMoveElement == false || this._pressedElement == null) return;
             this._enterElement = element;
+            this._nowCanMoveElement = false;
+            this.ExchangeElement();
         }
 
         private void OnReleaseElement(IGameElementView element)
         {
-            if (this._pressedElement != null && this._enterElement != null && this._nowCanMoveElement == true) {
-                this._nowCanMoveElement = false;
+            if (this._lastEnterElement.x != element.x || this._lastEnterElement.y != element.y) {
+                this.RevertElement();
+                this.ResetMoveElementState();
+                return;
+            }
+            if (this._pressedElement != null && this._enterElement != null) {
                 this.CheckSelectElementError();
                 if (this.JudgeAround(this._pressedElement, this._enterElement)) {
-                    this.ExchangeElement();
-                } else {
-                    this.ResetMoveElementState();
+                    this.StartJudge();
+                    return;
                 }
             }
+            this.ResetMoveElementState();
         }
 
         private void CheckSelectElementError() {
@@ -76,8 +84,8 @@ namespace EGame.Core
             if (element1.CanMove() && element2.CanMove()) {
                 this._element1X = element1.x; this._element1Y = element1.y;
                 this._element2X = element2.x; this._element2Y = element2.y;
-                element1.MoveElement(this._element2X, this._element2Y, this._game.fillTime, this.PressedElementMoveEnd);
-                element2.MoveElement(this._element1X, this._element1Y, this._game.fillTime, null);
+                element1.MoveElement(this._element2X, this._element2Y, this._game.fillTime, this.PressedElementMoveEnd, null);
+                element2.MoveElement(this._element1X, this._element1Y, this._game.fillTime, null, null);
                 elements[element1.x, element1.y] = element1;
                 elements[element2.x, element2.y] = element2;
                 return;
@@ -86,6 +94,9 @@ namespace EGame.Core
         }
 
         private void PressedElementMoveEnd(IGameElementView view) {
+        }
+
+        private void StartJudge() {
             IJudgeRule judge = this._game.judgeSystem.StartJudge(this._pressedElement, this._enterElement, JudgeType.Active);
             if (judge == null) {
                 judge = this._game.judgeSystem.StartJudge(this._enterElement, this._pressedElement, JudgeType.Active);
@@ -101,9 +112,9 @@ namespace EGame.Core
             GameElement[,] elements = this._game.gameElements;
             var element1 = elements[this._element2X, this._element2Y];
             var element2 = elements[this._element1X, this._element1Y];
-            element1.MoveElement(this._element1X, this._element1Y, this._game.fillTime * 2f, this.RevertElementMoveEnd);
+            element1.MoveElement(this._element1X, this._element1Y, this._game.fillTime * 2f, this.RevertElementMoveEnd, null);
             elements[element1.x, element1.y] = element1;
-            element2.MoveElement(this._element2X, this._element2Y, this._game.fillTime * 2f, null);
+            element2.MoveElement(this._element2X, this._element2Y, this._game.fillTime * 2f, null, null);
             elements[element2.x, element2.y] = element2;
         }
 

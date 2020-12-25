@@ -85,7 +85,11 @@ namespace EGame.Core
         }
 
         public void Reset() {
-            this._fsm.SetNextState(new FillElementState(this._fsm, this));
+            if (this._fsm.currState != null && this._fsm.currState.name != "ExchangeElementState") {
+                return;
+            }
+            this._fsm.SetNextState(new FillBarrierState(this._fsm, this));
+            // this._fsm.SetNextState(new FillElementState(this._fsm, this));
             this._fsm.ChangeState(new ResetState(this._fsm, this));
         }
 
@@ -127,6 +131,21 @@ namespace EGame.Core
 
         public void Destory() {
             this._fsm.Destory();
+        }
+
+        public void DebugImageIds() {
+            this._gameController.LogInfo("=========================================>>>>");
+            string str = "";
+            for (int j = 0; j < this._elementRows; j++) {
+                string s2 = "";
+                for (int i = 0; i < this._elementCols; i++) {
+                    var e = this._elements[i, j];
+                    s2 += string.Format("{0},", e.elementView != null ? e.elementView.imageId : -1);
+                }
+                str = s2 + "\n" + str;
+            }
+            this._gameController.LogInfo("\n" + str);
+            this._gameController.LogInfo("<<<<=========================================");
         }
     }
 }

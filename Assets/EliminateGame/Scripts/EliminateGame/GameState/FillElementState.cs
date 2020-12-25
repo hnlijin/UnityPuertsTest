@@ -25,8 +25,6 @@ namespace EGame.Core
             this._startFill = true;
             this._frameTime = 0.1f;
             this._maxFillTime = 0.1f;
-            this._crossElements.Clear();
-            // this.FillElement(out this._maxFillTime);
         }
 
         private void FillEnd() {
@@ -50,13 +48,12 @@ namespace EGame.Core
                     if (element.CanMove()) {
                         GameElement emptyElement = this.FindEndElement(x, y, true, this._crossElements);
                         if (emptyElement.y != y) {
-                            float fillTime = ((y - emptyElement.y) + 1) * this._game.fillTime;
+                            float fillTime = this.GetFillTime(x, y, emptyElement.x, emptyElement.y, this._crossElements);
                             if (fillTime > maxFillTime) maxFillTime = fillTime;
-                            element.MoveElement(emptyElement.x, emptyElement.y, fillTime, this.PlayDropBackAnimation, this._crossElements.ToArray());
-                            var tempElement = elements[x, y - 1];
                             elements[emptyElement.x, emptyElement.y] = element;
-                            emptyElement.MoveElement(x, y, 0, null, null);
+                            element.MoveElement(emptyElement.x, emptyElement.y, fillTime, this.PlayDropBackAnimation, this._crossElements.ToArray());
                             elements[x, y] = emptyElement;
+                            emptyElement.MoveElement(x, y, 0, null, null);
                             filledNotFinished = true;
                         }
                     }
@@ -76,7 +73,7 @@ namespace EGame.Core
                     targetElement.elementView = view;
                     // 配置元素属性
                     targetElement.Init(targetElement.x, targetElement.y, GameElementType.Normal);
-                    float fillTime = ((y - targetElement.y) + 1) * this._game.fillTime;
+                    float fillTime = this.GetFillTime(x, y + 1, targetElement.x, targetElement.y, this._crossElements);
                     if (fillTime > maxFillTime) maxFillTime = fillTime;
                     targetElement.MoveElement(targetElement.x, targetElement.y, fillTime, this.PlayDropBackAnimation, this._crossElements.ToArray());
                     if (targetElement.elementView != null && targetElement.elementType == GameElementType.Normal) {
@@ -96,33 +93,37 @@ namespace EGame.Core
                 GameElement element = elements[x, j];
                 GameElement leftElement = null, rightElement = null;
                 GameElement nextLeftElement = null, nextRightElement = null;
-                if (x > 0) leftElement = elements[x - 1, y];
-                if (x < cols - 1) rightElement = elements[x + 1, y];
-                if (x > 0 && y > 0) nextLeftElement = elements[x - 1, y - 1];
-                if (x < cols - 1 && y > 0) nextRightElement = elements[x + 1, y - 1];
-                if (enableCrossBarrier == true && element.elementType == GameElementType.Empty) {
-                // 如果左元素为障碍物，就检查障碍物下方是否可以下落
-                    if (leftElement != null && nextLeftElement != null) { 
+                if (x > 0) leftElement = elements[x - 1, j];
+                if (x < cols - 1) rightElement = elements[x + 1, j];
+                if (x > 0 && j > 0) nextLeftElement = elements[x - 1, j - 1];
+                if (x < cols - 1 && j > 0) nextRightElement = elements[x + 1, j - 1];
+                if (enableCrossBarrier == true) {
+                    // 左倾斜填充：当前元素左边为障碍物且下方为空
+                    if (leftElement != null && nextLeftElement != null) {
                         if (leftElement.elementType == GameElementType.Barrier && nextLeftElement.elementType == GameElementType.Empty) {
-                            crossElements.Add(element);
-                            crossElements.Add(nextLeftElement);
-                            GameElement e = this.FindEndElement(nextLeftElement.x, nextLeftElement.y, false, null);
-                            return e;
+                            if (element.y != y) crossElements.Add(element); // 防止转折点是自身
+                            GameElement targetElement = this.FindEndElement(nextLeftElement.x, nextLeftElement.y, false, null);
+                            if (targetElement.y != nextLeftElement.y) crossElements.Add(nextLeftElement); // 防止转折点是目标
+                            return targetElement;
                         }
-                    // 如果右元素为障碍物，就检查障碍物下方是否可以下落
-                    } else if (rightElement != null && nextRightElement != null) { 
+                    }
+                    // 右倾斜填充：当前元素右边为障碍物且下方为空
+                    if (rightElement != null && nextRightElement != null) { 
                         if (rightElement.elementType == GameElementType.Barrier && nextRightElement.elementType == GameElementType.Empty) {
-                            crossElements.Add(element);
-                            crossElements.Add(nextRightElement);
-                            GameElement e = this.FindEndElement(nextRightElement.x, nextRightElement.y, false, null);
-                            return e;
+                            if (element.y != y) crossElements.Add(element); // 防止转折点是自身
+                            GameElement targetElement = this.FindEndElement(nextRightElement.x, nextRightElement.y, false, null);
+                            if (targetElement.y != nextRightElement.y) crossElements.Add(nextRightElement); // 防止转折点是目标
+                            return targetElement;
                         }
                     }
                 }
                 if (j > 0) {
                     GameElement nextElement = elements[x, j - 1];
-                    if (element.elementType == GameElementType.Empty && nextElement.elementType != GameElementType.Empty) {
-                        return element;
+                    if (nextElement.elementType != GameElementType.Empty) {
+                        if (element.elementType == GameElementType.Empty) {
+                            return element;
+                        }
+                        return elements[x, y];
                     }
                 } else if (element.elementType == GameElementType.Empty) {
                     return element;
@@ -134,8 +135,28 @@ namespace EGame.Core
         private void PlayDropBackAnimation(IGameElementView target) {
             GameElement[,] elements = this._game.gameElements;
             GameElement element = elements[target.x, target.y];
-            this._game.gameController.LogInfo("PlayDropBackAnimation: " + string.Format("{0}/{1}", target.x, target.y));
+            // this._game.gameController.LogInfo("PlayDropBackAnimation: " + string.Format("{0}/{1}", target.x, target.y));
             element.elementView.PlayAnimation(GameElementAnimation.DropBack, null);
+        }
+
+        private float GetFillTime(int initX, int initY, int targetX, int targetY, List<GameElement> paths) {
+            if (paths.Count <= 0) {
+                return (initY - targetY) * this._game.fillTime;
+            }
+            int preX = initX, preY = initY;
+            float fillTime = 0f;
+            for (int i = 0; i < paths.Count; i++) {
+                var e = paths[i];
+                if (preX == e.x) {
+                    fillTime += (preY - e.y) * this._game.fillTime;
+                } else if (preX != e.x) {
+                    int dy = Math.Abs(preY - e.y);
+                    fillTime += Math.Abs(preX - e.x) * this._game.fillTime + (dy - 1) * this._game.fillTime;
+                }
+                preX = e.x; preY = e.y;
+            }
+            fillTime += (preY - targetY) * this._game.fillTime;
+            return fillTime;
         }
 
         public void Update(float deltaTime)
@@ -156,6 +177,7 @@ namespace EGame.Core
             this._startFill = false;
             this._frameTime = 0f;
             this._maxFillTime = 0.1f;
+            this._crossElements.Clear();
         }
     }
 }

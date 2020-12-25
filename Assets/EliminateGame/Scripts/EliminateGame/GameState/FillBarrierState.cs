@@ -32,9 +32,14 @@ namespace EGame.Core
                 element.Init(x, y, GameElementType.Barrier);
                 element.elementView = view;
             }
-            // int x = 1, y = 4;
+            // int x = 4, y = 2;
             // var element = elements[x, y];
             // var view = this._game.gameController.CreateGameElementView(x, y, GameElementType.Barrier);
+            // element.Init(x, y, GameElementType.Barrier);
+            // element.elementView = view;
+            // x = 5; y = 3;
+            // element = elements[x, y];
+            // view = this._game.gameController.CreateGameElementView(x, y, GameElementType.Barrier);
             // element.Init(x, y, GameElementType.Barrier);
             // element.elementView = view;
             this._game.OnFillBarrierComplete();

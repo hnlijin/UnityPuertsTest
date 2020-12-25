@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using System;
 using EGame.Core;
 
 public class GameElementView : MonoBehaviour, IGameElementView
@@ -73,6 +74,7 @@ public class GameElementView : MonoBehaviour, IGameElementView
 
     public void MoveElement(int targetX, int targetY, float time, IElementMoveEndCallback callback, GameElement[] paths)
     {
+        int preX = this.x, preY = this.y;
         this._x = targetX;
         this._y = targetY;
         this.gameObject.name = "element:" + targetX + "_" + targetY;
@@ -89,18 +91,27 @@ public class GameElementView : MonoBehaviour, IGameElementView
             return;
         }
         if (paths != null && paths.Length > 0) {
-            this._moveCoroutine = StartCoroutine(MovePathCoroutine(targetX, targetY, time, callback, paths));
+            this._moveCoroutine = StartCoroutine(MovePathCoroutine(preX, preY, targetX, targetY, time, callback, paths));
             return;
         }
         this._moveCoroutine = StartCoroutine(MoveCoroutine(targetX, targetY, time, callback));
     }
 
-    IEnumerator MovePathCoroutine(int targetX, int targetY, float time, IElementMoveEndCallback callback, GameElement[] paths) {
+    IEnumerator MovePathCoroutine(int preX, int preY, int targetX, int targetY, float time, IElementMoveEndCallback callback, GameElement[] paths) {
+        float fillTime = 0f;
         for (int i = 0; i < paths.Length; i++) {
             GameElement e = paths[i];
-            yield return StartCoroutine(MoveCoroutine(e.x, e.y, time, null));
+            if (preX == e.x) {
+                fillTime = (preY - e.y) * this.gameController.game.fillTime;
+            } else if (preX != e.x) {
+                int dy = Math.Abs(preY - e.y);
+                fillTime = Math.Abs(preX - e.x) * this.gameController.game.fillTime + (dy - 1) * this.gameController.game.fillTime;
+            }
+            preX = e.x; preY = e.y;
+            yield return StartCoroutine(MoveCoroutine(e.x, e.y, fillTime, null));
         }
-        yield return StartCoroutine(MoveCoroutine(targetX, targetY, time, null));
+        fillTime = (preY - targetY) * this.gameController.game.fillTime;
+        yield return StartCoroutine(MoveCoroutine(targetX, targetY, fillTime, callback));
     }
 
     IEnumerator MoveCoroutine(int targetX, int targetY, float time, IElementMoveEndCallback callback)

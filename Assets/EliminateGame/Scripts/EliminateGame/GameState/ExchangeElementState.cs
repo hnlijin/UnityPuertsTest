@@ -97,14 +97,15 @@ namespace EGame.Core
         }
 
         private void StartJudge() {
-            IJudgeRule judge = this._game.judgeSystem.StartJudge(this._pressedElement, this._enterElement, JudgeType.Active);
-            if (judge == null) {
-                judge = this._game.judgeSystem.StartJudge(this._enterElement, this._pressedElement, JudgeType.Active);
-            }
-            if (judge == null) {
+            JudgeResult[] judgeResults = new JudgeResult[2];
+            judgeResults[0] = this._game.judgeSystem.StartJudge(this._pressedElement, this._enterElement, JudgeType.Active);
+            judgeResults[1] = this._game.judgeSystem.StartJudge(this._enterElement, this._pressedElement, JudgeType.Active);
+            if (judgeResults[0] == null && judgeResults[1] == null) {
                 this.RevertElement();
             } else {
-                this._fsm.ChangeState(new ExeJudgeState(this._fsm, this._game, judge, ExeJudgeFrom.Exchange));
+                var exeJudgeState = new ExeJudgeState(this._fsm, this._game);
+                exeJudgeState.SetData(judgeResults, ExeJudgeFrom.Exchange);
+                this._fsm.ChangeState(exeJudgeState);
             }
         }
 

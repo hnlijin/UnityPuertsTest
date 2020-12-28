@@ -28,14 +28,28 @@ namespace EGame.Core
         System,   // 系统触发
     }
 
+    public class JudgeResult {
+        public Direction direction = Direction.Null;
+        public int selectedElementX = -1;
+        public int selectedElementY = -1;
+        public GameElementType selectedElementType = GameElementType.Null;
+
+        public GameElement[] clearElements = null;
+        public NewElement[] newElements = null;
+        public ChangeElement[] changeElements = null;
+
+        public void Reset() {
+            direction = Direction.Null;
+            selectedElementX = -1; selectedElementY = -1;
+            selectedElementType = GameElementType.Null;
+            clearElements = null;
+            newElements = null;
+            changeElements = null;
+        }
+    }
+
     public interface IJudgeRule {
-        bool IsMathch();
-        int selectedElementX { get; }
-        int selectedElementY { get; }
-        GameElementType selectedElementType { get; }
-        GameElement[] GetClearElements();
-        ChangeElement[] GetChangeElements();
-        NewElement[] GetNewElements();
+        JudgeResult IsMathch();
     }
 
     /** 判定系统 */
@@ -51,6 +65,7 @@ namespace EGame.Core
         private IGameElementView _selectedElement = null;
         private IGameElementView _otherElement = null;
         private JudgeType _judgeType = JudgeType.Null;
+        private Queue<JudgeResult> _judgeResultPool = new Queue<JudgeResult>();
 
         public List<GameElement> leftSameImageList { get { return this._leftSameImageList; } }
         public List<GameElement> rightSameImageList { get { return this._rightSameImageList; } }
@@ -81,20 +96,20 @@ namespace EGame.Core
             }
         }
 
-        public IJudgeRule StartJudge(IGameElementView selectedElement, IGameElementView otherElement, JudgeType judgeType) {
+        public JudgeResult StartJudge(IGameElementView selectedElement, IGameElementView otherElement, JudgeType judgeType) {
             this.ClearJudgeEnv();
             this._selectedElement = selectedElement;
             this._otherElement = otherElement;
             this._judgeType = judgeType;
             this.InitJudgeEnv();
-            IJudgeRule judge = null;
+            JudgeResult result = null;
             for (int i = 0; i < this._judgeRules.Count; i++) {
-                if (this._judgeRules[i].IsMathch()) {
-                    judge = this._judgeRules[i];
+                result = this._judgeRules[i].IsMathch();
+                if (result != null) {
                     break;
                 }
             }
-            return judge;
+            return result;
         }
 
         private void InitJudgeEnv() {
@@ -137,6 +152,17 @@ namespace EGame.Core
             this._downSameImageList.RemoveRange(0, this._downSameImageList.Count);
             this._selectedElement = null;
             this._judgeType = JudgeType.Null;
+        }
+
+        public JudgeResult CreateJudgeResult() {
+            if (this._judgeResultPool.Count > 0) return this._judgeResultPool.Dequeue();
+            return new JudgeResult();
+        }
+
+        public void RecoveryJudgeResult(JudgeResult result) {
+            if (result == null) return;
+            result.Reset();
+            this._judgeResultPool.Enqueue(result);
         }
     }   
 }

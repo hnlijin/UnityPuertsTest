@@ -11,6 +11,7 @@ namespace EGame.Core
         private EliminateGame _game = null;
         private float _timeout = 0;
         private Callback _timeoutCallback = null;
+        List<JudgeResult> _judges = new List<JudgeResult>();
 
         public JudgeAllElementState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;
@@ -26,22 +27,21 @@ namespace EGame.Core
             int cols = this._game.elementCols;
             int rows = this._game.elementRows;
             GameElement[,] elements = this._game.gameElements;
-            bool hasMatch = false;
+            this._judges.Clear();
             for (int i = 0; i < cols; i++) {
                 for (int j = 0; j < rows; j++) {
                     var e = elements[i, j];
-                    IJudgeRule judge = this._game.judgeSystem.StartJudge(e.elementView, null, JudgeType.System);
-                    if (judge != null) {
-                        this._fsm.ChangeState(new ExeJudgeState(this._fsm,this._game, judge, ExeJudgeFrom.Judge));
-                        hasMatch = true;
-                        break;
+                    JudgeResult judgeResult = this._game.judgeSystem.StartJudge(e.elementView, null, JudgeType.System);
+                    if (judgeResult != null) {
+                        this._judges.Add(judgeResult);
                     }
                 }
-                if (hasMatch == true) {
-                    break;
-                }
             }
-            if (hasMatch == false) {
+            if (this._judges.Count > 0) {
+                var exeJudgeState = new ExeJudgeState(this._fsm, this._game);
+                exeJudgeState.SetData(this._judges.ToArray(), ExeJudgeFrom.Judge);
+                this._fsm.ChangeState(exeJudgeState);
+            } else {
                 this._fsm.ChangeState(new ExchangeElementState(this._fsm, this._game));
             }
         }
@@ -67,7 +67,7 @@ namespace EGame.Core
         }
 
         public void Exit() {
-
+            this._judges.Clear();
         }
     }   
 }

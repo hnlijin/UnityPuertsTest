@@ -7,61 +7,61 @@ namespace EGame.Core
     public class WulianxiaoJudgeRule : IJudgeRule
     {
         private JudgeSystem _system = null;
-        private Direction _direction = Direction.Null;
-        private int _selectedElementX = -1, _selectedElementY = -1;
-        private GameElementType _selectedElementType = GameElementType.Null;
-        public int selectedElementX { get { return this._selectedElementX; } }
-        public int selectedElementY { get { return this._selectedElementY; } }
-        public GameElementType selectedElementType { get { return this._selectedElementType; } }
 
         public WulianxiaoJudgeRule(JudgeSystem system) {
             this._system = system;
         }
 
-        public bool IsMathch() {
-            this._direction = Direction.Null;
-            this._selectedElementX = this._system.selectedElement.x;
-            this._selectedElementY = this._system.selectedElement.y;
-            this._selectedElementType = GameElementType.Null;
+        public JudgeResult IsMathch() {
             if (this._system.leftSameImageList.Count + this._system.rightSameImageList.Count >= 4) {
-                this._direction = Direction.Horizontal;
-                this._selectedElementType = GameElementType.Normal;
-                return true;
+                var result = this._system.CreateJudgeResult();
+                result.direction = Direction.Horizontal;
+                result.selectedElementX = this._system.selectedElement.x;
+                result.selectedElementY = this._system.selectedElement.y;
+                result.selectedElementType = GameElementType.Normal;
+                result.clearElements = this.GetClearElements(result);
+                result.newElements = this.GetNewElements(result);
+                result.changeElements = this.GetChangeElements(result);
+                return result;
             }
             if (this._system.upSameImageList.Count + this._system.downSameImageList.Count >= 4) {
-                this._direction = Direction.Vertical;
-                this._selectedElementType = GameElementType.Normal;
-                return true;
+                var result = this._system.CreateJudgeResult();
+                result.direction = Direction.Vertical;
+                result.selectedElementX = this._system.selectedElement.x;
+                result.selectedElementY = this._system.selectedElement.y;
+                result.selectedElementType = GameElementType.Normal;
+                result.clearElements = this.GetClearElements(result);
+                result.newElements = this.GetNewElements(result);
+                result.changeElements = this.GetChangeElements(result);
+                return result;
             }
-            this._selectedElementX = -1;
-            this._selectedElementY = -1;
-            return false;
-        }
-
-        public ChangeElement[] GetChangeElements() {
             return null;
         }
 
-        public NewElement[] GetNewElements() {
-            if (this._direction == Direction.Horizontal || this._direction == Direction.Vertical) {
+        public ChangeElement[] GetChangeElements(JudgeResult result) {
+            return null;
+        }
+
+        private NewElement[] GetNewElements(JudgeResult result) {
+            if (result.direction == Direction.Horizontal || result.direction == Direction.Vertical) {
                 GameElement[,] elements = this._system.game.gameElements;
                 NewElement[] newElements = new NewElement[1];
                 newElements[0] = new NewElement();
-                newElements[0].oldElement = elements[this._selectedElementX, this._selectedElementY];
+                newElements[0].oldElement = elements[result.selectedElementX, result.selectedElementY];
                 newElements[0].newElementType = GameElementType.Same;
                 return newElements;
             }
             return null;
         }
 
-        public GameElement[] GetClearElements() {
-            if (this._direction == Direction.Horizontal) {
+        public GameElement[] GetClearElements(JudgeResult result) {
+            if (result.direction == Direction.Horizontal) {
                 int count = this._system.leftSameImageList.Count + this._system.rightSameImageList.Count;
                 if (count >= 2) {
                     GameElement[] clearElements = new GameElement[count + 1];
                     GameElement[,] elements = this._system.game.gameElements;
                     int index = 0;
-                    clearElements[index] = elements[this._selectedElementX, this._selectedElementY];
+                    clearElements[index] = elements[result.selectedElementX, result.selectedElementY];
                     index += 1;
                     for (int i = 0; i < this._system.leftSameImageList.Count; i++) {
                         clearElements[index] = this._system.leftSameImageList[i];
@@ -73,13 +73,13 @@ namespace EGame.Core
                     }
                     return clearElements;
                 }
-            } else if (this._direction == Direction.Vertical) {
+            } else if (result.direction == Direction.Vertical) {
                 int count = this._system.upSameImageList.Count + this._system.downSameImageList.Count;
                 if (count >= 2) {
                     GameElement[] clearElements = new GameElement[count + 1];
                     GameElement[,] elements = this._system.game.gameElements;
                     int index = 0;
-                    clearElements[index] = elements[this._selectedElementX, this._selectedElementY];
+                    clearElements[index] = elements[result.selectedElementX, result.selectedElementY];
                     index += 1;
                     for (int i = 0; i < this._system.upSameImageList.Count; i++) {
                         clearElements[index] = this._system.upSameImageList[i];

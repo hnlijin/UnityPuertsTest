@@ -17,25 +17,41 @@ namespace EGame.Core
         private FSM _fsm = null;
         private EliminateGame _game = null;
         private ExeJudgeFrom _from = ExeJudgeFrom.Null;
-        private IJudgeRule _judge = null;
+        private JudgeResult[] _judgeResults = null;
         private float _timeout = 0;
         private Callback _timeoutCallback = null;
+        private List<GameElement> allClearElements = new List<GameElement>();
+        private List<NewElement> allNewElements = new List<NewElement>();
 
-        public ExeJudgeState(FSM fsm, EliminateGame game, IJudgeRule judge, ExeJudgeFrom from) {
+        public ExeJudgeState(FSM fsm, EliminateGame game) {
             this._fsm = fsm;
             this._game = game;
-            this._judge = judge;
+        }
+
+        public void SetData(JudgeResult[] judgeResults, ExeJudgeFrom from) {
+            this._judgeResults = judgeResults;
             this._from = from;
         }
 
         public void Enter()
         {
-            GameElement[] clearElements = this._judge.GetClearElements();
-            if (clearElements != null) {
-                int len = clearElements.Length;
+            allClearElements.Clear();
+            for (int i = 0; i < this._judgeResults.Length; i++) {
+                if (this._judgeResults[i] == null) continue;
+                GameElement[] clearElements = this._judgeResults[i].clearElements;
+                if (clearElements != null && clearElements.Length > 0) {
+                    for (int j = 0; j < clearElements.Length; j++) {
+                        if (!allClearElements.Contains(clearElements[j])) {
+                            allClearElements.Add(clearElements[j]);
+                        }
+                    }
+                }
+            }
+            if (allClearElements.Count >= 0) {
+                int count = allClearElements.Count;
                 int clearCount = 0;
-                for (int i = 0; i < len; i++) {
-                    GameElement e = clearElements[i];
+                for (int i = 0; i < count; i++) {
+                    GameElement e = allClearElements[i];
                     if (e == null) {
                         clearCount += 1;
                         continue;
@@ -43,7 +59,7 @@ namespace EGame.Core
                     e.elementView.PlayAnimation(GameElementAnimation.Disappear, (IGameElementView view, string name) => {
                         this.ClearElement(e);
                         clearCount += 1;
-                        if (clearCount == len) {
+                        if (clearCount == count) {
                             this.ExeNewElements();
                         }
                     });
@@ -54,12 +70,23 @@ namespace EGame.Core
         }
 
         private void ExeNewElements() {
-            NewElement[] newElements = this._judge.GetNewElements();
-            if (newElements != null) {
+            allNewElements.Clear();
+            for (int i = 0; i < this._judgeResults.Length; i++) {
+                if (this._judgeResults[i] == null) continue;
+                NewElement[] newElements = this._judgeResults[i].newElements;
+                if (newElements != null && newElements.Length > 0) {
+                    for (int j = 0; j < newElements.Length; j++) {
+                        if (!allNewElements.Contains(newElements[j])) {
+                            allNewElements.Add(newElements[j]);
+                        }
+                    }
+                }
+            }
+            if (allNewElements.Count > 0) {
                 GameElement[,] elements = this._game.gameElements;
-                for (int i = 0; i < newElements.Length; i++) {
-                    GameElement element = newElements[i].oldElement;
-                    GameElementType newElementType = newElements[i].newElementType;
+                for (int i = 0; i < allNewElements.Count; i++) {
+                    GameElement element = allNewElements[i].oldElement;
+                    GameElementType newElementType = allNewElements[i].newElementType;
                     element.Init(element.x, element.y, newElementType);
                     element.elementView = this._game.gameController.CreateGameElementView(element.x, element.y, newElementType);
                 }
@@ -68,6 +95,13 @@ namespace EGame.Core
         }
 
         private void ExeJudgeEnd() {
+            if (this._judgeResults.Length > 0) {
+                for (int i = 0; i < this._judgeResults.Length; i++) {
+                    var result = this._judgeResults[i];
+                    this._game.judgeSystem.RecoveryJudgeResult(result);
+                }
+            }
+            this._judgeResults = null;
             this._game.judgeSystem.ClearJudgeEnv();
             if (this._from == ExeJudgeFrom.Judge || this._from == ExeJudgeFrom.Exchange) {
                 this.SetTimeout(0.1f, () => {
@@ -104,7 +138,8 @@ namespace EGame.Core
         }
 
         public void Exit() {
-
+            allClearElements.Clear();
+            allNewElements.Clear();
         }
     }   
 }

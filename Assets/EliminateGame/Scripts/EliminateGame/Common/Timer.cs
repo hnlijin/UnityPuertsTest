@@ -40,6 +40,7 @@ namespace EGame.Core
         private bool _timeoutLock = false;
         private List<TimerInfo> _lockTimeouts = new List<TimerInfo>();
         private List<TimerInfo> _preDelTimeouts = new List<TimerInfo>();
+        private List<TimeoutCallback> _preDelCallback = new List<TimeoutCallback>();
         private Queue<TimerInfo> _timerInfoPool = new Queue<TimerInfo>();
 
         public void SetTimeout(float time, TimeoutCallback callback) {
@@ -57,41 +58,53 @@ namespace EGame.Core
         }
 
         public void ClearTimeout(TimeoutCallback callback) {
-            for (int i = 0; i < this._timeouts.Count; i++) {
-                if(this._timeouts[i].callback == callback) {
-                    this._timeouts.Remove(this._timeouts[i]);
-                    break;
+            if (callback == null) return;
+            if (this._timeoutLock == false) {
+                for (int i = 0; i < this._timeouts.Count; i++) {
+                    if(this._timeouts[i].callback == callback) {
+                        this._timeouts.Remove(this._timeouts[i]);
+                        this.AddTimerInfo(this._timeouts[i]);
+                        break;
+                    }
                 }
+            } else {
+                this._preDelCallback.Add(callback);
             }
         }
 
         public void Update(float deltaTime) {
             this._timeoutLock = true;
             for (int i = 0; i < this._timeouts.Count; i++) {
-                var timer = this._timeouts[i];
-                timer.Update(deltaTime);
-                if (timer.IsCanClean() == true){
-                    this._preDelTimeouts.Add(timer);
+                var timerInfo = this._timeouts[i];
+                timerInfo.Update(deltaTime);
+                if (timerInfo.IsCanClean() == true){
+                    this._preDelTimeouts.Add(timerInfo);
                 }
             }
             for (int j = 0; j < this._preDelTimeouts.Count; j++) {
-                var timer = this._preDelTimeouts[j];
-                this._timeouts.Remove(timer);
+                var timerInfo = this._preDelTimeouts[j];
+                this._timeouts.Remove(timerInfo);
+                this.AddTimerInfo(timerInfo);
             }
             this._preDelTimeouts.Clear();
             this._timeouts.AddRange(this._lockTimeouts);
             this._lockTimeouts.Clear();
             this._timeoutLock = false;
+            for (int j = 0; j < this._preDelCallback.Count; j++) {
+                var callback = this._preDelCallback[j];
+                this.ClearTimeout(callback);
+            }
+            this._preDelCallback.Clear();
         }
 
-        public TimerInfo CreateTimerInfo() {
+        private TimerInfo CreateTimerInfo() {
             if (this._timerInfoPool.Count > 0) {
                 return this._timerInfoPool.Dequeue();
             }
             return new TimerInfo();
         }
 
-        public void AddTimerInfo(TimerInfo timerInfo) {
+        private void AddTimerInfo(TimerInfo timerInfo) {
             timerInfo.Reset();
             this._timerInfoPool.Enqueue(timerInfo);
         }
